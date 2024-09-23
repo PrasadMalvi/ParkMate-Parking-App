@@ -57,8 +57,6 @@ const HomeScreen = ({ navigation }) => {
       </View>
 
       <View style={styles.moreOptions}>
-        <Text style={styles.moreOptionsText}>More Options</Text>
-
         <TouchableOpacity
           style={styles.moreOptionButton}
           onPress={() => navigation.navigate("ParkingHistory")}
@@ -66,9 +64,9 @@ const HomeScreen = ({ navigation }) => {
           <FontAwesome5
             name="history"
             color={"white"}
-            style={styles.iconStyle}
+            style={styles.iconStyle1}
           />
-          <Text style={styles.buttonText}>Parking History</Text>
+          <Text style={styles.buttonText1}>Parking History</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -78,21 +76,21 @@ const HomeScreen = ({ navigation }) => {
           <FontAwesome5
             name="credit-card"
             color={"white"}
-            style={styles.iconStyle}
+            style={styles.iconStyle1}
           />
-          <Text style={styles.buttonText}>Payment Methods</Text>
+          <Text style={styles.buttonText1}>Payment Methods</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
           style={styles.moreOptionButton}
-          onPress={() => navigation.navigate("HelpAndSupport")}
+          onPress={() => navigation.navigate("AdvanceBookingHistory")}
         >
           <FontAwesome5
-            name="life-ring"
+            name="calendar-check"
             color={"white"}
-            style={styles.iconStyle}
+            style={styles.iconStyle1}
           />
-          <Text style={styles.buttonText}>Help & Support</Text>
+          <Text style={styles.buttonText1}>Advance Booking History</Text>
         </TouchableOpacity>
       </View>
       <FooterMenu />
@@ -104,7 +102,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: "#f8f9fa",
+    backgroundColor: "#021218",
   },
   headerText: {
     fontSize: 24,
@@ -116,25 +114,39 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     marginBottom: 20,
+    height: 100,
+    width: 350,
+    marginLeft: -15,
   },
   button: {
     flex: 1,
-    backgroundColor: "#007bff",
+    backgroundColor: "#6fd2f6",
     borderRadius: 10,
     padding: 20,
     alignItems: "center",
     marginHorizontal: 10,
   },
   buttonText: {
+    color: "#096c90",
+    fontSize: 16,
+    marginTop: 10,
+  },
+  buttonText1: {
     color: "white",
     fontSize: 16,
     marginTop: 10,
   },
   iconStyle: {
     fontSize: 30,
+    color: "#064860",
+  },
+  iconStyle1: {
+    fontSize: 30,
+    color: "white",
   },
   moreOptions: {
-    marginTop: 20,
+    marginTop: 0,
+    marginBottom: 45,
   },
   moreOptionsText: {
     fontSize: 20,
@@ -143,7 +155,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   moreOptionButton: {
-    backgroundColor: "#28a745",
+    backgroundColor: "#096c90",
     borderRadius: 10,
     padding: 15,
     alignItems: "center",

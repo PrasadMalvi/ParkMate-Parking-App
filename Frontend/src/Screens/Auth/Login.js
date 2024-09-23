@@ -45,16 +45,16 @@ const Login = ({ navigation }) => {
     <View style={styles.container}>
       <Image style={styles.logo} source={require("../../../assets/Logo.png")} />
       <Text style={styles.pageTitle}>Login</Text>
-      <View style={{ marginHorizontal: 20 }}>
+      <View style={{ marginHorizontal: 20, padding: 10 }}>
         <InputBox
-          inputTitle={"E-Mail"}
+          inputTitle={"  E-Mail"}
           keyboardType="email-address"
           autoComplete="email"
           value={email}
           setValue={setEmail}
         />
         <InputBox
-          inputTitle={"Password"}
+          inputTitle={"  Password"}
           autoComplete="password"
           secureTextEntry={true}
           value={password}
@@ -68,7 +68,7 @@ const Login = ({ navigation }) => {
         handleSubmit={handleSubmit}
       />
       <Text style={styles.loginText}>
-        Already registed ?{" "}
+        New User!.{" "}
         <Text
           style={styles.loginLink}
           onPress={() => navigation.navigate("Register")}
@@ -85,13 +85,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: "center",
-    backgroundColor: "#30B19B",
+    backgroundColor: "#6fd2f6",
   },
   pageTitle: {
     fontSize: 40,
     fontWeight: "bold",
     textAlign: "center",
-    color: "#2C3E50",
+    color: "#096c90",
     marginBottom: 20,
     marginTop: -100,
   },
@@ -110,13 +110,14 @@ const styles = StyleSheet.create({
     alignContent: "center",
     justifyContent: "center",
     marginTop: -100,
-    marginRight: 50,
+    marginRight: 80,
+    marginLeft: -20,
   },
   loginText: {
     textAlign: "center",
   },
   loginLink: {
-    color: "#ffffff",
+    color: "#096c90",
   },
 });
 

@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const parkingLocationSchema = new mongoose.Schema({
   userId: {
-    type: mongoose.Schema.Types.ObjectId, // Reference to the User model
+    type: mongoose.Schema.Types.ObjectId,
     ref: "User",
     required: true,
   },

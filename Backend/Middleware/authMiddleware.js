@@ -1,8 +1,11 @@
+// Middleware/authMiddleware.js
 const jwt = require("jsonwebtoken");
 const User = require("../Models/userModel");
 
 const authenticateUser = async (req, res, next) => {
-  const token = req.headers.authorization?.split(" ")[1]; // Get token from 'Authorization: Bearer <token>'
+  const token = req.headers.authorization?.split(" ")[1]; // Bearer token
+
+  console.log("Incoming token:", token); // Log the token to see if it's received correctly
 
   if (!token) {
     return res
@@ -12,7 +15,7 @@ const authenticateUser = async (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await User.findById(decoded._id).select("-password"); // Fetch user data without password
+    const user = await User.findById(decoded._id).select("-password");
 
     if (!user) {
       return res
@@ -20,10 +23,11 @@ const authenticateUser = async (req, res, next) => {
         .json({ success: false, message: "Unauthorized, user not found" });
     }
 
-    req.user = user; // Attach user to request object
+    req.user = user;
+    console.log("Authenticated user:", req.user); // Log user details
     next();
   } catch (error) {
-    return res
+    res
       .status(401)
       .json({ success: false, message: "Unauthorized, invalid token" });
   }

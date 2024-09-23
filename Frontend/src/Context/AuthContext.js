@@ -7,7 +7,6 @@ const AuthContext = createContext();
 
 // Define the AuthProvider component
 const AuthProvider = ({ children }) => {
-  // Global state for user authentication
   const [state, setState] = useState({
     user: null,
     token: "",
@@ -17,18 +16,16 @@ const AuthProvider = ({ children }) => {
   axios.defaults.baseURL = "http://192.168.0.101:5050";
 
   // Set the authorization token header if a token exists
-  if (state.token) {
-    axios.defaults.headers.common["Authorization"] = `Bearer ${state.token}`;
-  }
-
-  // Initialize state from AsyncStorage
   useEffect(() => {
     const loadLocalStorageData = async () => {
       try {
         const data = await AsyncStorage.getItem("@auth");
         const parsedData = JSON.parse(data);
-        if (parsedData) {
+        if (parsedData && parsedData.token) {
           setState({ user: parsedData.user, token: parsedData.token });
+          axios.defaults.headers.common[
+            "Authorization"
+          ] = `Bearer ${parsedData.token}`;
         }
       } catch (error) {
         console.log("Error loading data from AsyncStorage:", error);

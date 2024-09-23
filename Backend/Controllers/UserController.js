@@ -83,14 +83,14 @@ const loginController = async (req, res) => {
     }
     //JWT TOKEN
     const token = await JWT.sign({ _id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "1d",
+      expiresIn: "17d",
     });
 
     //Undefined Password
     user.password = undefined;
     res.status(200).send({
       success: true,
-      message: "Login Successfully",
+      message: "Login Successful",
       token,
       user,
     });

@@ -9,7 +9,8 @@ import {
 } from "react-native";
 import FooterMenu from "../../Components/Menus/FooterMenu";
 
-const ChatScreen = ({ bookingId }) => {
+const ChatScreen = ({ route }) => {
+  const { bookingId } = route.params;
   const [messages, setMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState("");
 

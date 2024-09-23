@@ -39,16 +39,16 @@ const Register = ({ navigation }) => {
       <Image style={styles.logo} source={require("../../../assets/Logo.png")} />
       <Text style={styles.pageTitle}>SignUp</Text>
       <View style={{ marginHorizontal: 20 }}>
-        <InputBox inputTitle={"Name"} value={name} setValue={setName} />
+        <InputBox inputTitle={"  Name"} value={name} setValue={setName} />
         <InputBox
-          inputTitle={"E-Mail"}
+          inputTitle={"  E-Mail"}
           keyboardType="email-address"
           autoComplete="email"
           value={email}
           setValue={setEmail}
         />
         <InputBox
-          inputTitle={"Password"}
+          inputTitle={"  Password"}
           autoComplete="password"
           secureTextEntry={true}
           value={password}
@@ -62,7 +62,7 @@ const Register = ({ navigation }) => {
         handleSubmit={handleSubmit}
       />
       <Text style={styles.loginText}>
-        Already registed ?{" "}
+        Already Registered!{" "}
         <Text
           style={styles.loginLink}
           onPress={() => navigation.navigate("Login")}
@@ -79,7 +79,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: "center",
-    backgroundColor: "#30B19B",
+    backgroundColor: "#6fd2f6",
   },
   pageTitle: {
     fontSize: 40,
@@ -105,12 +105,13 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginTop: -100,
     marginRight: 50,
+    marginLeft: -20,
   },
   loginText: {
     textAlign: "center",
   },
   loginLink: {
-    color: "#ffffff",
+    color: "#096c90",
   },
 });
 

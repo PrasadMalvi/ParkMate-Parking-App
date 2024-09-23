@@ -15,6 +15,10 @@ import PaymentScreen from "./src/Screens/Payment/PaymentScreen";
 import HelpAndSupport from "./src/Screens/Help&Support/HelpAndSupport";
 import ProfileScreen from "./src/Screens/Profile/ProfileScreen";
 import HeaderMenu from "./src/Components/Menus/HeaderMenu";
+import ParkedLocation from "./src/Screens/Parking/ParkedLocation";
+import ConfirmBookingScreen from "./src/Screens/Booking/ConfirmBookingScreen";
+import AdvanceBookingHistory from "./src/Screens/Booking/AdvanceBookingHistory";
+import SpotLocation from "./src/Screens/Booking/SpotLocation";
 
 export default function App() {
   const Stack = createNativeStackNavigator();
@@ -43,6 +47,13 @@ export default function App() {
           <Stack.Screen
             name="ParkingLocationScreen"
             component={ParkingLocationScreen}
+            options={{
+              title: "ParkMate",
+            }}
+          />
+          <Stack.Screen
+            name="ParkedLocation"
+            component={ParkedLocation}
             options={{
               title: "ParkMate",
             }}
@@ -106,6 +117,27 @@ export default function App() {
           <Stack.Screen
             name="PaymentScreen"
             component={PaymentScreen}
+            options={{
+              title: "ParkMate",
+            }}
+          />
+          <Stack.Screen
+            name="ConfirmBookingScreen"
+            component={ConfirmBookingScreen}
+            options={{
+              title: "ParkMate",
+            }}
+          />
+          <Stack.Screen
+            name="AdvanceBookingHistory"
+            component={AdvanceBookingHistory}
+            options={{
+              title: "ParkMate",
+            }}
+          />
+          <Stack.Screen
+            name="SpotLocation"
+            component={SpotLocation}
             options={{
               title: "ParkMate",
             }}

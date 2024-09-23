@@ -17,10 +17,14 @@ const HeaderMenu = () => {
       {/* Icons Container */}
       <View style={styles.iconsContainer}>
         <TouchableOpacity onPress={() => navigation.navigate("WalletScreen")}>
-          <FontAwesome5 name="wallet" color={"blue"} style={styles.iconStyle} />
+          <FontAwesome5
+            name="wallet"
+            color={"white"}
+            style={styles.iconStyle}
+          />
         </TouchableOpacity>
         <TouchableOpacity onPress={() => navigation.navigate("ProfileScreen")}>
-          <FontAwesome5 name="user" color={"blue"} style={styles.iconStyle} />
+          <FontAwesome5 name="user" color={"white"} style={styles.iconStyle} />
         </TouchableOpacity>
       </View>
     </View>
@@ -34,10 +38,10 @@ const styles = StyleSheet.create({
     justifyContent: "space-between", // Aligns logo to the left and icons to the right
     paddingVertical: 5, // Adds vertical padding
     paddingHorizontal: 10, // Adds horizontal padding to the entire header
-    backgroundColor: "#30B19B", // Header background color
+    backgroundColor: "#3FC3E5", // Header background color
     marginLeft: -20,
     marginTop: -20,
-    width: 412,
+    width: 360,
     marginBottom: 25,
     height: 110,
   },
@@ -47,8 +51,9 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   iconStyle: {
-    fontSize: 35, // Size of the icons
+    fontSize: 25, // Size of the icons
     marginHorizontal: 8, // Space between the icons
+    color: "#064860",
   },
   headerLogo: {
     height: 120, // Adjusted height of the logo
