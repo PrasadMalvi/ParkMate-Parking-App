@@ -5,8 +5,6 @@ const User = require("../Models/userModel");
 const authenticateUser = async (req, res, next) => {
   const token = req.headers.authorization?.split(" ")[1]; // Bearer token
 
-  console.log("Incoming token:", token); // Log the token to see if it's received correctly
-
   if (!token) {
     return res
       .status(401)
@@ -24,7 +22,6 @@ const authenticateUser = async (req, res, next) => {
     }
 
     req.user = user;
-    console.log("Authenticated user:", req.user); // Log user details
     next();
   } catch (error) {
     res

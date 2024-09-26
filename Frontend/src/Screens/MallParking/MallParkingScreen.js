@@ -1,34 +1,92 @@
-import React, { useState } from "react";
-import { View, Text, Button, StyleSheet } from "react-native";
+import React, { useState, useEffect } from "react";
+import { View, Text, Button, StyleSheet, Alert } from "react-native";
 import FooterMenu from "../../Components/Menus/FooterMenu";
 import { BarCodeScanner } from "expo-barcode-scanner";
+import axios from "axios"; // Make sure you have axios installed
 
 const MallParkingScreen = () => {
   const [isParked, setIsParked] = useState(false);
-  const [hasPermission, setHasPermission] = React.useState(null);
-  const [scanned, setScanned] = React.useState(false);
+  const [hasPermission, setHasPermission] = useState(null);
+  const [scanned, setScanned] = useState(false);
+  const [startTime, setStartTime] = useState(null);
+  const [timeParked, setTimeParked] = useState(0); // in minutes
+  const [price, setPrice] = useState(0);
 
-  React.useEffect(() => {
+  // Request camera permission
+  useEffect(() => {
     (async () => {
       const { status } = await BarCodeScanner.requestPermissionsAsync();
       setHasPermission(status === "granted");
     })();
   }, []);
 
+  // Handle barcode scan
   const handleBarCodeScanned = ({ type, data }) => {
     setScanned(true);
-    alert(`Bar code with type ${type} and data ${data} has been scanned!`);
-    // Logic to handle scanned QR code data
+    if (isParked) {
+      handlePunchOut(data); // Handle exit QR code
+    } else {
+      handlePunchIn(data); // Handle entry QR code
+    }
   };
 
-  const handlePunchIn = () => {
+  // Logic for punch-in
+  const handlePunchIn = async (data) => {
     setIsParked(true);
-    // Logic for punch-in
+    setStartTime(new Date());
+    // Assuming the QR code data contains the mall ID or similar for backend
+    Alert.alert(
+      "Entry QR scanned!",
+      "You have successfully entered the parking."
+    );
   };
 
-  const handlePunchOut = () => {
-    setIsParked(false);
-    // Logic for punch-out and payment
+  // Logic for punch-out and payment
+  const handlePunchOut = async (data) => {
+    const endTime = new Date();
+    const duration = Math.floor((endTime - startTime) / 60000); // Calculate duration in minutes
+    setTimeParked(duration);
+
+    // Calculate price based on duration
+    const pricePer30Min = 10; // ₹10 per 30 minutes
+    const totalPrice = Math.ceil(duration / 30) * pricePer30Min; // Round up to the nearest 30 minutes
+    setPrice(totalPrice);
+
+    // Logic to deduct from wallet or ask for payment
+    const confirmation = await confirmPayment(totalPrice);
+    if (confirmation) {
+      setIsParked(false);
+      setStartTime(null);
+      setScanned(false);
+      Alert.alert(
+        "Exit QR scanned!",
+        `You have successfully exited. Total cost: ₹${totalPrice}`
+      );
+    }
+  };
+
+  const confirmPayment = (totalPrice) => {
+    return new Promise((resolve) => {
+      Alert.alert(
+        "Payment Required",
+        `Total amount to pay: ₹${totalPrice}. Confirm?`,
+        [
+          {
+            text: "Cancel",
+            onPress: () => resolve(false),
+            style: "cancel",
+          },
+          {
+            text: "Pay",
+            onPress: () => {
+              // Logic to deduct from user's wallet (API call or state management)
+              // For now, we will just resolve true
+              resolve(true);
+            },
+          },
+        ]
+      );
+    });
   };
 
   if (hasPermission === null) {
@@ -46,6 +104,7 @@ const MallParkingScreen = () => {
       <Button
         title={isParked ? "Punch Out" : "Punch In"}
         onPress={isParked ? handlePunchOut : handlePunchIn}
+        disabled={scanned} // Disable button while scanning
       />
       <BarCodeScanner
         onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
@@ -60,8 +119,8 @@ const MallParkingScreen = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20 },
-  status: { fontSize: 20, marginBottom: 20 },
+  container: { flex: 1, padding: 20, backgroundColor: "#021218" },
+  status: { fontSize: 20, marginBottom: 20, color: "white" },
 });
 
 export default MallParkingScreen;

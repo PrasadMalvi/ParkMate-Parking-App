@@ -1,7 +1,7 @@
 // parkingSpotController.js
 const ParkingSpot = require("../Models/ParkingSpot");
 const AdvanceBooking = require("../Models/AdvanceBook");
-
+const mongoose = require("mongoose");
 // Create a new parking spot (no token required)
 const createParkingSpot = async (req, res) => {
   try {
@@ -92,7 +92,10 @@ const getParkingSpotById = async (req, res) => {
         .json({ success: false, message: "Parking spot not found" });
     }
 
-    return res.json({ success: true, data: spot });
+    return res.json({
+      success: true,
+      data: spot, // Ensure the entire parking spot object is sent, including timeSlots
+    });
   } catch (error) {
     return res.status(500).json({
       success: false,
@@ -102,72 +105,118 @@ const getParkingSpotById = async (req, res) => {
   }
 };
 
-// Book a parking spot (token required)
-// Book a parking spot (token required)
 const bookParkingSpot = async (req, res) => {
+  const session = await mongoose.startSession();
+  session.startTransaction(); // Start transaction to ensure atomicity
+
   try {
     const { spotId, timeSlot, vehicleType } = req.body;
-    const userId = req.user.id; // Assuming the user info is available in the request after authentication
+    const userId = req.user.id;
 
-    // Find the parking spot
-    const spot = await ParkingSpot.findById(spotId);
-
+    // Step 1: Find the parking spot
+    const spot = await ParkingSpot.findById(spotId).session(session);
     if (!spot) {
+      await session.abortTransaction(); // Rollback if spot is not found
+      session.endSession();
       return res
         .status(404)
         .json({ success: false, message: "Parking spot not found" });
     }
 
-    // Find the correct time slot
+    // Step 2: Find the correct time slot
     const slot = spot.timeSlots.find(
       (ts) =>
         ts.startTime === timeSlot.startTime && ts.endTime === timeSlot.endTime
     );
 
     if (!slot) {
+      await session.abortTransaction(); // Rollback if invalid time slot
+      session.endSession();
       return res
         .status(400)
         .json({ success: false, message: "Invalid time slot" });
     }
+    // Map vehicle type to maxSlots key
+    const vehicleTypeMap = {
+      "two-wheeler": "twoWheeler",
+      "four-wheeler": "fourWheeler",
+      other: "other",
+    };
+    const maxSlotsKey = vehicleTypeMap[vehicleType];
+    // Step 3: Check the available slots for the selected vehicle type
+    console.log("Available slots Before booking:", slot.maxSlots[maxSlotsKey]);
 
-    // Check if there are available slots for the selected vehicle type
-    const vehicleTypeData = spot.vehicleTypes.find(
-      (v) => v.type === vehicleType
-    );
-
-    if (!vehicleTypeData || vehicleTypeData.maxSlots <= 0) {
+    // Check if the selected vehicle type has available slots
+    if (slot.maxSlots[maxSlotsKey] <= 0) {
+      await session.abortTransaction(); // Rollback if no available slots
+      session.endSession();
       return res.status(400).json({
         success: false,
         message: "No available slots for this vehicle type",
       });
     }
 
-    // Decrement the available slots for the specific time slot
-    slot.maxSlots -= 1;
+    // Step 4: Decrement the available slots
 
-    // If maxSlots reaches zero, mark the slot as booked
-    if (slot.maxSlots === 0) {
-      slot.isBooked = true;
-    }
+    slot.maxSlots[maxSlotsKey] -= 1;
+    console.log("Available slots after booking:", slot.maxSlots[maxSlotsKey]);
+
+    // Update the timeSlots array in the ParkingSpot document
+    const updatedTimeSlots = spot.timeSlots.map((ts) => {
+      if (
+        ts.startTime === timeSlot.startTime &&
+        ts.endTime === timeSlot.endTime
+      ) {
+        return slot;
+      }
+      return ts;
+    });
+
+    spot.timeSlots = updatedTimeSlots;
 
     // Save the updated parking spot
-    await spot.save();
+    await spot.save({ session });
 
-    // Create an entry in the AdvanceBooking collection
+    // Step 5: Mark slot as booked if necessary
+    if (slot.maxSlots[maxSlotsKey] === 0) {
+      spot.timeSlots = spot.timeSlots.map((ts) => {
+        if (
+          ts.startTime === timeSlot.startTime &&
+          ts.endTime === timeSlot.endTime
+        ) {
+          ts.isBooked = true;
+        }
+        return ts;
+      });
+    }
+
+    // Step 6: Save the updated parking spot
+    await spot.save({ session });
+    console.log("Parking spot updated successfully");
+
+    // Step 7: Create the booking
     const newBooking = new AdvanceBooking({
       user: userId,
       spot: spotId,
-      bookingDate: new Date().toISOString().split("T")[0], // Current date
+      bookingDate: new Date().toISOString().split("T")[0],
       bookingTime: `${slot.startTime} - ${slot.endTime}`,
       vehicleType: vehicleType,
     });
 
-    await newBooking.save(); // Save the booking record
+    await newBooking.save({ session });
+
+    // Commit the transaction
+    await session.commitTransaction();
+    session.endSession();
 
     return res
       .status(200)
       .json({ success: true, message: "Booking confirmed", data: spot });
   } catch (error) {
+    console.error("Error during booking:", error);
+    await session.abortTransaction(); // Abort transaction in case of error
+    session.endSession();
+
     return res.status(500).json({
       success: false,
       message: "Error booking parking spot",
@@ -175,7 +224,6 @@ const bookParkingSpot = async (req, res) => {
     });
   }
 };
-
 // Fetch the advance booking history for the authenticated user
 const getAdvanceBookingHistory = async (req, res) => {
   try {

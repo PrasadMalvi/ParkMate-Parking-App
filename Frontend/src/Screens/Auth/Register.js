@@ -10,6 +10,17 @@ const Register = ({ navigation }) => {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const validateEmail = (email) => {
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@(gmail\.com|yahoo\.com)$/;
+    return emailRegex.test(email);
+  };
+
+  const validatePassword = (password) => {
+    const passwordRegex =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    return passwordRegex.test(password);
+  };
+
   const handleSubmit = async () => {
     try {
       setLoading(true);
@@ -18,7 +29,21 @@ const Register = ({ navigation }) => {
         setLoading(false);
         return;
       }
-      setLoading(false);
+
+      if (!validateEmail(email)) {
+        Alert.alert("Please enter a valid email (gmail.com or yahoo.com)");
+        setLoading(false);
+        return;
+      }
+
+      if (!validatePassword(password)) {
+        Alert.alert(
+          "Password must be at least 8 characters long, include at least one uppercase letter, one lowercase letter, one number, and one special character."
+        );
+        setLoading(false);
+        return;
+      }
+
       const { data } = await axios.post("/auth/register", {
         name,
         email,
@@ -55,7 +80,6 @@ const Register = ({ navigation }) => {
           setValue={setPassword}
         />
       </View>
-      {/*<Text>{JSON.stringify({name,email,password},null,4)}</Text>*/}
       <SubmitButton
         btnTitle="Register"
         loading={loading}

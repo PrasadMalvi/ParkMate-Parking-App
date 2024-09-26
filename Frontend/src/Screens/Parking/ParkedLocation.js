@@ -22,7 +22,6 @@ const ParkedLocation = ({ route }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Parked Location</Text>
       <MapView style={styles.map} initialRegion={initialRegion}>
         <Marker
           coordinate={{
@@ -42,8 +41,11 @@ const ParkedLocation = ({ route }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "transparent" },
-  title: { fontSize: 20, fontWeight: "bold", marginBottom: 20, padding: 20 },
+  container: {
+    flex: 1,
+    backgroundColor: "#021218",
+    marginTop: 30,
+  },
   map: { width, height },
   buttonContainer: {
     position: "absolute", // Place button on top of the map

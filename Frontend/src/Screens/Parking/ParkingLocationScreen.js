@@ -12,7 +12,7 @@ import * as Location from "expo-location";
 import axios from "axios";
 import { AuthContext } from "../../Context/AuthContext";
 
-const ParkingLocationScreen = ({ token }) => {
+const ParkingLocationScreen = ({ token, navigation }) => {
   const [location, setLocation] = useState(null);
   const [markerLocation, setMarkerLocation] = useState(null);
   const [isLocationSaved, setIsLocationSaved] = useState(false);
@@ -85,6 +85,7 @@ const ParkingLocationScreen = ({ token }) => {
           `Vehicle parked at: Lat: ${markerLocation.latitude}, Lon: ${markerLocation.longitude}`
         );
         setIsLocationSaved(true);
+        navigation.navigate("ParkingHistory");
       } catch (error) {
         Alert.alert("Error", "Failed to save parking location.");
         console.log(

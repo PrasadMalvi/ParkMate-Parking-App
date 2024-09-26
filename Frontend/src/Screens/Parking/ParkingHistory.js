@@ -1,10 +1,11 @@
-import { View, Text, FlatList, StyleSheet } from "react-native";
 import React, { useState, useEffect, useContext } from "react";
+import { View, Text, FlatList, StyleSheet } from "react-native";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AuthContext } from "../../Context/AuthContext";
 import { useNavigation } from "@react-navigation/native";
 import { MaterialCommunityIcons } from "@expo/vector-icons"; // Import MaterialCommunityIcons for map icon
+import FooterMenu from "../../Components/Menus/FooterMenu";
 
 const ParkingHistoryScreen = () => {
   const [parkingHistory, setParkingHistory] = useState([]);
@@ -41,57 +42,85 @@ const ParkingHistoryScreen = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Parking History</Text>
-      <FlatList
-        data={parkingHistory}
-        keyExtractor={(item) => item._id.toString()}
-        renderItem={({ item }) => (
-          <View style={styles.historyItem}>
-            <Text style={styles.dateText}>
-              {new Date(item.date).toLocaleDateString()}
-            </Text>
-            <View style={styles.mapIconContainer}>
-              <MaterialCommunityIcons
-                name="map-marker-outline"
-                size={24}
-                color="#007bff"
-                onPress={() => handleNavigateToMap(item)}
-              />
-              <Text
-                style={styles.viewOnMap}
-                onPress={() => handleNavigateToMap(item)}
-              >
-                View on Map
+      {/* If no spots are found */}
+      {parkingHistory.length === 0 ? (
+        <Text style={styles.fullText}>No parking history</Text>
+      ) : (
+        <FlatList
+          data={parkingHistory}
+          keyExtractor={(item) => item._id.toString()}
+          renderItem={({ item }) => (
+            <View style={styles.historyItem}>
+              <Text style={styles.location}>
+                {new Date(item.date).toLocaleDateString()}
               </Text>
+              <Text style={styles.address}>
+                {new Date(item.date).toLocaleTimeString()}
+              </Text>
+              <View style={styles.mapIconContainer}>
+                <MaterialCommunityIcons
+                  name="map-marker-outline"
+                  size={24}
+                  color="#007bff"
+                  onPress={() => handleNavigateToMap(item)}
+                  marginLeft={150}
+                  marginTop={-70}
+                />
+                <Text
+                  style={styles.viewOnMap}
+                  onPress={() => handleNavigateToMap(item)}
+                >
+                  View on Map
+                </Text>
+              </View>
             </View>
-          </View>
-        )}
-      />
+          )}
+        />
+      )}
+
+      {/* Footer Menu */}
+      <FooterMenu />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, backgroundColor: "#021218" },
-  title: {
-    fontSize: 20,
-    fontWeight: "bold",
-    marginBottom: 20,
-    color: "#096c90",
-  },
-  historyItem: {
+  container: {
+    flex: 1,
     padding: 20,
-    borderBottomWidth: 1,
-    borderColor: "#ccc",
-    flexDirection: "row", // Arrange contents horizontally
-    justifyContent: "space-between", // Align items horizontally
-    alignItems: "center", // Align items vertically
+    backgroundColor: "#021218",
+    paddingBottom: -10,
+    paddingTop: 10,
   },
-  dateText: { fontSize: 16, color: "#096c90" },
+  fullText: { fontSize: 18, color: "red", textAlign: "center" },
+  historyItem: {
+    marginVertical: 10,
+    padding: 15,
+    borderColor: "#096c90",
+    borderWidth: 1,
+    borderRadius: 5,
+    backgroundColor: "#0a1f29", // Background color for spot item
+  },
+  location: {
+    fontSize: 20,
+    marginBottom: 10,
+    fontWeight: "bold",
+    color: "white", // Text color for location
+  },
+  address: {
+    fontSize: 14,
+    marginBottom: 10,
+    color: "white", // Text color for address
+  },
   mapIconContainer: { flexDirection: "row", alignItems: "center" },
   viewOnMap: {
-    color: "#096c90",
-    textDecorationLine: "underline",
+    color: "#ffffff",
+    textAlign: "center",
+    fontWeight: "bold",
+    backgroundColor: "#096c90",
+    padding: 10,
+    borderRadius: 5,
+    marginTop: -70,
     marginLeft: 10,
   },
 });

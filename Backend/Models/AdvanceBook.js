@@ -10,9 +10,9 @@ const advanceBookingSchema = new mongoose.Schema(
     },
     bookingDate: { type: String, required: true },
     bookingTime: { type: String, required: true },
-    status: { type: String, default: "Booked" },
+    status: { type: String, enum: ["Booked", "Cancelled"], default: "Booked" },
   },
-  { timestamps: true } // This adds createdAt and updatedAt fields
+  { timestamps: true }
 );
 
 const AdvanceBooking = mongoose.model("AdvanceBooking", advanceBookingSchema);

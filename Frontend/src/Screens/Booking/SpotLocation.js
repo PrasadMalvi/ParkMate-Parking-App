@@ -22,7 +22,6 @@ const SpotLocation = ({ route }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Booked Spot Location</Text>
       <MapView style={styles.map} initialRegion={initialRegion}>
         <Marker
           coordinate={{

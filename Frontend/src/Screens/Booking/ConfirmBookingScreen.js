@@ -29,7 +29,7 @@ const ConfirmBookingScreen = ({ route, navigation }) => {
           headers: { Authorization: `Bearer ${token}` },
         });
         setParkingSpot(data.data);
-        console.log("Fetched Parking Spot:", data.data); // Debugging line
+        /*         console.log("Fetched Parking Spot:", data.data); */
       } catch (error) {
         console.log("Error fetching parking spot details:", error);
         Alert.alert("Error", "Failed to load parking spot details.");
@@ -46,6 +46,7 @@ const ConfirmBookingScreen = ({ route, navigation }) => {
       Alert.alert("Error", "Please select both vehicle type and time slot.");
       return;
     }
+
     try {
       setIsBooking(true);
       const { token } = state;
@@ -53,33 +54,29 @@ const ConfirmBookingScreen = ({ route, navigation }) => {
       const bookingData = {
         spotId,
         vehicleType,
-        timeSlot: { startTime, endTime },
+        timeSlot: {
+          startTime,
+          endTime,
+        },
       };
+      // Send booking request to backend
+      const response = await axios.post(
+        `/parkingspot/advancebook`,
+        bookingData,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
-      await axios.post(`/parkingspot/advancebook`, bookingData, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      // Update local state to reflect booking
-      setParkingSpot((prevSpot) => {
-        const updatedTimeSlots = prevSpot.timeSlots.map((slot) => {
-          if (slot.startTime === startTime && slot.endTime === endTime) {
-            return {
-              ...slot,
-              isBooked: true,
-              maxSlots: {
-                ...slot.maxSlots,
-                [vehicleType]: slot.maxSlots[vehicleType] - 1,
-              },
-            };
-          }
-          return slot;
-        });
-        return { ...prevSpot, timeSlots: updatedTimeSlots };
-      });
-
-      Alert.alert("Success", "Parking spot booked successfully!");
-      navigation.navigate("AdvanceBookingHistory");
+      if (response.data.success) {
+        Alert.alert(
+          "Success",
+          "Parking spot booking successful Please Check Booking History!"
+        );
+        navigation.navigate("HomeScreen");
+      } else {
+        throw new Error(response.data.message);
+      }
     } catch (error) {
       console.log("Error booking parking spot:", error);
       Alert.alert("Error", "Failed to book parking spot.");
@@ -104,20 +101,26 @@ const ConfirmBookingScreen = ({ route, navigation }) => {
     );
   }
 
-  // Add debug logs to inspect `maxSlots` for each time slot
-  console.log("Vehicle Type selected:", vehicleType);
+  // Vehicle type map to match backend data
+  const vehicleTypeMap = {
+    "two-wheeler": "twoWheeler",
+    "four-wheeler": "fourWheeler",
+    other: "other",
+  };
+
+  // Get the correct vehicle type key for available slots
+  const selectedVehicleKey = vehicleTypeMap[vehicleType];
 
   // Filter available time slots based on the selected vehicle type
-  const filteredTimeSlots = parkingSpot.timeSlots.filter((slot) => {
-    // Log maxSlots for debugging
-    console.log("Slot startTime:", slot.startTime, "maxSlots:", slot.maxSlots);
-    const maxSlotsForVehicle = slot.maxSlots[vehicleType];
-    console.log(`maxSlots for ${vehicleType}:`, maxSlotsForVehicle);
-    return maxSlotsForVehicle > 0 && !slot.isBooked;
-  });
+  const filteredTimeSlots = parkingSpot.timeSlots.filter(
+    (slot) => slot.maxSlots[selectedVehicleKey] > 0
+  );
 
+  // Map available time slots to picker items
   const timeSlotLabels = filteredTimeSlots.map((slot) => ({
-    label: `${slot.startTime} - ${slot.endTime} (Available: ${slot.maxSlots[vehicleType]})`,
+    label: `${slot.startTime} - ${slot.endTime} (Available: ${
+      slot.maxSlots[selectedVehicleKey] || 0
+    })`,
     value: `${slot.startTime} - ${slot.endTime}`,
   }));
 
@@ -133,7 +136,7 @@ const ConfirmBookingScreen = ({ route, navigation }) => {
         </Text>
       </View>
 
-      {/* Vehicle Type Selection */}
+      {/* Vehicle Type Picker */}
       <View style={styles.pickerContainer}>
         <Text style={styles.pickerLabel}>Select Vehicle Type:</Text>
         <Picker
@@ -151,7 +154,7 @@ const ConfirmBookingScreen = ({ route, navigation }) => {
         </Picker>
       </View>
 
-      {/* Time Slot Selection */}
+      {/* Time Slot Picker */}
       <View style={styles.pickerContainer}>
         <Text style={styles.pickerLabel}>Select Time Slot:</Text>
         <Picker
@@ -170,15 +173,14 @@ const ConfirmBookingScreen = ({ route, navigation }) => {
           )}
         </Picker>
       </View>
-
-      {/* Confirm Booking Button */}
-      <Button
-        title={isBooking ? "Booking..." : "Confirm Booking"}
-        onPress={handleConfirmBooking}
-        color="#096c90"
-        disabled={!vehicleType || !selectedTimeSlot || isBooking}
-      />
-
+      <View style={styles.buttonContainer}>
+        <Button
+          title={isBooking ? "Booking..." : "Confirm Booking"}
+          onPress={handleConfirmBooking}
+          color="#096c90"
+          disabled={!vehicleType || !selectedTimeSlot || isBooking}
+        />
+      </View>
       <FooterMenu />
     </View>
   );
@@ -190,6 +192,7 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: "#021218",
     justifyContent: "center",
+    paddingBottom: -80,
   },
   loaderContainer: {
     flex: 1,
@@ -203,12 +206,14 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   spotDetails: {
-    marginBottom: 30,
+    marginBottom: 10,
+    marginTop: 50,
     padding: 15,
     borderColor: "#096c90",
     borderWidth: 1,
     borderRadius: 5,
     backgroundColor: "#0a1f29",
+    height: 150,
   },
   location: {
     fontSize: 20,
@@ -231,11 +236,12 @@ const styles = StyleSheet.create({
   },
   picker: {
     height: 50,
+    width: "100%",
     color: "white",
     backgroundColor: "#0a1f29",
-    borderColor: "#096c90",
-    borderWidth: 1,
-    borderRadius: 5,
+  },
+  buttonContainer: {
+    marginBottom: 178,
   },
 });
 

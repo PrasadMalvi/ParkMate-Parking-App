@@ -6,7 +6,7 @@ const morgan = require("morgan");
 const connectDB = require("./Config/db");
 const cron = require("node-cron");
 const ParkingSpot = require("./Models/ParkingSpot");
-
+const path = require("path");
 // Load environment variables from .env file
 dotenv.config();
 
@@ -20,11 +20,13 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(morgan("dev"));
-
+// Serve static files from the "profile-pics" directory
+app.use("/profile-pics", express.static(path.join(__dirname, "profile-pics")));
 // Routes
 app.use("/auth", require("./Routes/UserRoutes"));
 app.use("/parking", require("./Routes/ParkingRoute"));
 app.use("/parkingspot", require("./Routes/ParkingSoptRoute"));
+app.use("/mallparking", require("./Routes/MallParkingRoute"));
 
 // Define the port
 const PORT = process.env.PORT || 5051;

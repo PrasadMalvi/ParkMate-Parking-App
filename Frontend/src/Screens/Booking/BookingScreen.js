@@ -98,7 +98,13 @@ const BookingScreen = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, backgroundColor: "#021218" },
+  container: {
+    flex: 1,
+    padding: 20,
+    backgroundColor: "#021218",
+    paddingBottom: -10,
+    paddingTop: 10,
+  },
   searchInput: {
     height: 40,
     borderColor: "#096c90",
@@ -106,6 +112,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     paddingHorizontal: 10,
     marginBottom: 20,
+    marginTop: 20,
     color: "#096c90", // Input text color
   },
   fullText: { fontSize: 18, color: "red", textAlign: "center" },

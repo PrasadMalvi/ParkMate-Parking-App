@@ -18,6 +18,14 @@ const Users = new mongoose.Schema(
       min: 8,
       max: 64,
     },
+    profilePicture: {
+      type: String,
+      default: null, // URL of the profile picture
+    },
+    address: {
+      type: String,
+      required: [true, "Please Enter Address"],
+    },
   },
   { timestamps: true }
 );

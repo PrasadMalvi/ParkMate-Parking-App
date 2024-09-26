@@ -103,5 +103,68 @@ const loginController = async (req, res) => {
     });
   }
 };
+const updateProfileController = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { name, email, address, profilePicture } = req.body;
 
-module.exports = { registerController, loginController };
+    const updatedUser = await userModel.findByIdAndUpdate(
+      userId,
+      {
+        name,
+        email,
+        address,
+        profilePicture, // Save the URL of the profile picture
+      },
+      { new: true }
+    );
+
+    if (!updatedUser) {
+      return res
+        .status(404)
+        .send({ success: false, message: "User not found" });
+    }
+
+    res.status(200).send({ success: true, user: updatedUser });
+  } catch (error) {
+    console.error(error);
+    return res
+      .status(500)
+      .send({ success: false, message: "Error updating profile", error });
+  }
+};
+
+// Get User Data
+const getUserDataController = async (req, res) => {
+  try {
+    const userId = req.user._id; // Assuming you have set req.user in your authentication middleware
+
+    const user = await userModel.findById(userId).select("-password"); // Exclude password from the result
+
+    if (!user) {
+      return res.status(404).send({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    res.status(200).send({
+      success: true,
+      user,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).send({
+      success: false,
+      message: "Error fetching user data",
+      error,
+    });
+  }
+};
+
+module.exports = {
+  registerController,
+  loginController,
+  updateProfileController,
+  getUserDataController, // Export the new controller
+};

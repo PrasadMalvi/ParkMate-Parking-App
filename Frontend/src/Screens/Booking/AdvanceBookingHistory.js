@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import axios from "axios";
 import { AuthContext } from "../../Context/AuthContext";
+import FooterMenu from "../../Components/Menus/FooterMenu";
 
 const AdvanceBookingHistory = ({ navigation }) => {
   const [bookingHistory, setBookingHistory] = useState([]);
@@ -34,7 +35,7 @@ const AdvanceBookingHistory = ({ navigation }) => {
         }
       } catch (error) {
         console.log("Error fetching booking history:", error);
-        Alert.alert("Error", "Failed to load booking history.");
+        /* Alert.alert("Error", "Failed to load booking history."); */
       } finally {
         setIsLoading(false);
       }
@@ -93,6 +94,7 @@ const AdvanceBookingHistory = ({ navigation }) => {
           </View>
         )}
       />
+      <FooterMenu style={styles.ABHFooter} />
     </View>
   );
 };
@@ -104,6 +106,7 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
     backgroundColor: "#021218",
+    paddingBottom: -10,
   },
   loaderContainer: {
     flex: 1,
@@ -152,5 +155,8 @@ const styles = StyleSheet.create({
     color: "#ffffff",
     textAlign: "center",
     fontWeight: "bold",
+  },
+  ABHFooter: {
+    paddingTop: 20,
   },
 });

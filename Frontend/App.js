@@ -19,6 +19,9 @@ import ParkedLocation from "./src/Screens/Parking/ParkedLocation";
 import ConfirmBookingScreen from "./src/Screens/Booking/ConfirmBookingScreen";
 import AdvanceBookingHistory from "./src/Screens/Booking/AdvanceBookingHistory";
 import SpotLocation from "./src/Screens/Booking/SpotLocation";
+import EditProfile from "./src/Screens/Profile/EditProfile";
+import MyReviews from "./src/Screens/Profile/MyReviews";
+import AccountSettings from "./src/Screens/Profile/AccountSettings";
 
 export default function App() {
   const Stack = createNativeStackNavigator();
@@ -37,6 +40,61 @@ export default function App() {
             options={{ headerShown: false }}
           />
           <Stack.Screen
+            name="ProfileScreen"
+            component={ProfileScreen}
+            options={{
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen
+            name="EditProfile"
+            component={EditProfile}
+            options={{
+              title: "My Details",
+              headerStyle: {
+                backgroundColor: "#6fd2f6",
+                height: 60,
+              },
+              headerTitleStyle: {
+                fontSize: 18,
+                fontWeight: "bold",
+                color: "#021218",
+              },
+            }}
+          />
+          <Stack.Screen
+            name="MyReviews"
+            component={MyReviews}
+            options={{
+              title: "My Reviews",
+              headerStyle: {
+                backgroundColor: "#6fd2f6",
+                height: 60,
+              },
+              headerTitleStyle: {
+                fontSize: 18,
+                fontWeight: "bold",
+                color: "#021218",
+              },
+            }}
+          />
+          <Stack.Screen
+            name="AccountSettings"
+            component={AccountSettings}
+            options={{
+              title: "Settings",
+              headerStyle: {
+                backgroundColor: "#6fd2f6",
+                height: 60,
+              },
+              headerTitleStyle: {
+                fontSize: 18,
+                fontWeight: "bold",
+                color: "#021218",
+              },
+            }}
+          />
+          <Stack.Screen
             name="HomeScreen"
             component={HomeScreen}
             options={{
@@ -48,98 +106,211 @@ export default function App() {
             name="ParkingLocationScreen"
             component={ParkingLocationScreen}
             options={{
-              title: "ParkMate",
+              title: "Park My Vehicle",
+              headerStyle: {
+                backgroundColor: "#6fd2f6",
+                height: 60,
+              },
+              headerTitleStyle: {
+                fontSize: 18,
+                fontWeight: "bold",
+                color: "#021218",
+              },
             }}
           />
           <Stack.Screen
             name="ParkedLocation"
             component={ParkedLocation}
             options={{
-              title: "ParkMate",
+              title: "Parked Location",
+              headerStyle: {
+                backgroundColor: "#6fd2f6",
+                height: 60,
+              },
+              headerTitleStyle: {
+                fontSize: 18,
+                fontWeight: "bold",
+                color: "#021218",
+              },
             }}
           />
           <Stack.Screen
             name="BookingScreen"
             component={BookingScreen}
             options={{
-              title: "ParkMate",
+              title: "Advance Booking",
+              headerStyle: {
+                backgroundColor: "#6fd2f6",
+                height: 60,
+              },
+              headerTitleStyle: {
+                fontSize: 18,
+                fontWeight: "bold",
+                color: "#021218",
+              },
             }}
           />
           <Stack.Screen
             name="MallParkingScreen"
             component={MallParkingScreen}
             options={{
-              title: "ParkMate",
+              title: "Mall Parking",
+              headerStyle: {
+                backgroundColor: "#6fd2f6",
+                height: 60,
+              },
+              headerTitleStyle: {
+                fontSize: 18,
+                fontWeight: "bold",
+                color: "#021218",
+              },
             }}
           />
           <Stack.Screen
             name="FastTag"
             component={FastTag}
             options={{
-              title: "ParkMate",
+              title: "Fast Tag",
+              headerStyle: {
+                backgroundColor: "#6fd2f6",
+                height: 60,
+              },
+              headerTitleStyle: {
+                fontSize: 18,
+                fontWeight: "bold",
+                color: "#021218",
+              },
             }}
           />
           <Stack.Screen
             name="WalletScreen"
             component={WalletScreen}
             options={{
-              title: "ParkMate",
+              title: "My Wallet",
+              headerStyle: {
+                backgroundColor: "#6fd2f6",
+                height: 60,
+              },
+              headerTitleStyle: {
+                fontSize: 18,
+                fontWeight: "bold",
+                color: "#021218",
+              },
             }}
           />
           <Stack.Screen
             name="ParkingHistory"
             component={ParkingHistory}
             options={{
-              title: "ParkMate",
+              title: "My Parking History",
+              headerStyle: {
+                backgroundColor: "#6fd2f6",
+                height: 60,
+                borderBottomWidth: 0, // Remove the bottom border
+                elevation: 50, // Remove the elevation (shadow) on Android
+              },
+              headerTitleStyle: {
+                fontSize: 18,
+                fontWeight: "bold",
+                color: "#021218",
+              },
             }}
           />
           <Stack.Screen
             name="PaymentHistory"
             component={PaymentHistory}
             options={{
-              title: "ParkMate",
+              title: "Payment History",
+              headerStyle: {
+                backgroundColor: "#6fd2f6",
+                height: 60,
+              },
+              headerTitleStyle: {
+                fontSize: 18,
+                fontWeight: "bold",
+                color: "#021218",
+              },
             }}
           />
           <Stack.Screen
             name="HelpAndSupport"
             component={HelpAndSupport}
             options={{
-              title: "ParkMate",
+              title: "Help & Support",
+              headerStyle: {
+                backgroundColor: "#6fd2f6",
+                height: 60,
+              },
+              headerTitleStyle: {
+                fontSize: 18,
+                fontWeight: "bold",
+                color: "#021218",
+              },
             }}
           />
-          <Stack.Screen
-            name="ProfileScreen"
-            component={ProfileScreen}
-            options={{
-              title: "ParkMate",
-            }}
-          />
+
           <Stack.Screen
             name="PaymentScreen"
             component={PaymentScreen}
             options={{
-              title: "ParkMate",
+              title: "Payment Screen",
+              headerStyle: {
+                backgroundColor: "#6fd2f6",
+                height: 60,
+              },
+              headerTitleStyle: {
+                fontSize: 18,
+                fontWeight: "bold",
+                color: "#021218",
+              },
             }}
           />
           <Stack.Screen
             name="ConfirmBookingScreen"
             component={ConfirmBookingScreen}
             options={{
-              title: "ParkMate",
+              title: "Confirm Booking",
+              headerStyle: {
+                backgroundColor: "#6fd2f6",
+                height: 60,
+              },
+              headerTitleStyle: {
+                fontSize: 18,
+                fontWeight: "bold",
+                color: "#021218",
+              },
             }}
           />
           <Stack.Screen
             name="AdvanceBookingHistory"
             component={AdvanceBookingHistory}
             options={{
-              title: "ParkMate",
+              title: "Advance Booking History",
+              headerStyle: {
+                backgroundColor: "#6fd2f6",
+                height: 60,
+              },
+              headerTitleStyle: {
+                fontSize: 18,
+                fontWeight: "bold",
+                color: "#021218",
+              },
             }}
           />
           <Stack.Screen
             name="SpotLocation"
             component={SpotLocation}
             options={{
-              title: "ParkMate",
+              title: "My Spot Location",
+              headerStyle: {
+                backgroundColor: "#6fd2f6",
+                height: 60,
+              },
+              headerTitleStyle: {
+                fontSize: 18,
+                fontWeight: "bold",
+                color: "#021218",
+              },
             }}
           />
         </Stack.Navigator>
