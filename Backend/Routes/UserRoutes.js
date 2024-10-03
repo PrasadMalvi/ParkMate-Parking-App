@@ -22,6 +22,8 @@ router.post("/updateprofile", authenticateUser, updateProfileController);
 // Get User Data || GET
 router.get("/getUserData", authenticateUser, getUserDataController);
 
+//Add Vehicle Data
+
 // Upload Profile Picture || POST
 router.post(
   "/upload-profile-pic",

@@ -64,7 +64,7 @@ const Register = ({ navigation }) => {
       <Image style={styles.logo} source={require("../../../assets/Logo.png")} />
       <Text style={styles.pageTitle}>SignUp</Text>
       <View style={{ marginHorizontal: 20 }}>
-        <InputBox inputTitle={"  Name"} value={name} setValue={setName} />
+        <InputBox inputTitle={"  Full Name"} value={name} setValue={setName} />
         <InputBox
           inputTitle={"  E-Mail"}
           keyboardType="email-address"

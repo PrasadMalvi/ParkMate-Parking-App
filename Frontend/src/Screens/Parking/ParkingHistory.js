@@ -1,5 +1,12 @@
 import React, { useState, useEffect, useContext } from "react";
-import { View, Text, FlatList, StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  FlatList,
+  StyleSheet,
+  ActivityIndicator,
+  Alert,
+} from "react-native";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AuthContext } from "../../Context/AuthContext";
@@ -9,6 +16,7 @@ import FooterMenu from "../../Components/Menus/FooterMenu";
 
 const ParkingHistoryScreen = () => {
   const [parkingHistory, setParkingHistory] = useState([]);
+  const [loading, setLoading] = useState(true); // State to manage loading
   const [state, setState] = useContext(AuthContext);
   const navigation = useNavigation();
 
@@ -30,6 +38,8 @@ const ParkingHistoryScreen = () => {
           "Error",
           "An error occurred while fetching parking history."
         );
+      } finally {
+        setLoading(false); // Set loading to false once data is fetched
       }
     };
 
@@ -42,8 +52,14 @@ const ParkingHistoryScreen = () => {
 
   return (
     <View style={styles.container}>
-      {/* If no spots are found */}
-      {parkingHistory.length === 0 ? (
+      {/* Show activity indicator while loading */}
+      {loading ? (
+        <ActivityIndicator
+          size={80}
+          color="#007bff"
+          style={styles.loadingIndicator}
+        />
+      ) : parkingHistory.length === 0 ? (
         <Text style={styles.fullText}>No parking history</Text>
       ) : (
         <FlatList
@@ -92,7 +108,11 @@ const styles = StyleSheet.create({
     paddingBottom: -10,
     paddingTop: 10,
   },
-  fullText: { fontSize: 18, color: "red", textAlign: "center" },
+  fullText: {
+    fontSize: 18,
+    color: "red",
+    textAlign: "center",
+  },
   historyItem: {
     marginVertical: 10,
     padding: 15,
@@ -112,7 +132,10 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     color: "white", // Text color for address
   },
-  mapIconContainer: { flexDirection: "row", alignItems: "center" },
+  mapIconContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
   viewOnMap: {
     color: "#ffffff",
     textAlign: "center",
@@ -122,6 +145,10 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     marginTop: -70,
     marginLeft: 10,
+  },
+  loadingIndicator: {
+    flex: 1,
+    justifyContent: "center",
   },
 });
 

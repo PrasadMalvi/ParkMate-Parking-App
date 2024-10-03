@@ -23,8 +23,14 @@ const HeaderMenu = () => {
             style={styles.iconStyle}
           />
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate("ProfileScreen")}>
-          <FontAwesome5 name="user" color={"white"} style={styles.iconStyle} />
+        <TouchableOpacity
+          onPress={() => navigation.navigate("MyVehicleDetails")}
+        >
+          <FontAwesome5
+            name="folder-open"
+            color={"white"}
+            style={styles.iconStyle}
+          />
         </TouchableOpacity>
       </View>
     </View>

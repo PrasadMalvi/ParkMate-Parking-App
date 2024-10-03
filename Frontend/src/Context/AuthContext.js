@@ -13,29 +13,40 @@ const AuthProvider = ({ children }) => {
   });
 
   // Set default Axios settings
-  axios.defaults.baseURL = "http://192.168.0.101:5050";
+  axios.defaults.baseURL = "http://192.168.0.100:5050";
 
   // Set the authorization token header if a token exists
   useEffect(() => {
     const loadLocalStorageData = async () => {
-      try {
-        const data = await AsyncStorage.getItem("@auth");
-        const parsedData = JSON.parse(data);
-        if (parsedData && parsedData.token) {
-          setState({ user: parsedData.user, token: parsedData.token });
-          axios.defaults.headers.common[
-            "Authorization"
-          ] = `Bearer ${parsedData.token}`;
-        }
-      } catch (error) {
-        console.log("Error loading data from AsyncStorage:", error);
+      const data = await AsyncStorage.getItem("@auth");
+      const parsedData = JSON.parse(data);
+
+      // Check if data exists before setting state
+      if (parsedData) {
+        setState({
+          user: parsedData.user,
+          token: parsedData.token, // Fixed typo here
+        });
       }
     };
     loadLocalStorageData();
   }, []);
 
+  // If the token exists, set it as a default header for Axios
+  useEffect(() => {
+    if (state.token) {
+      axios.defaults.headers.common["Authorization"] = `Bearer ${state.token}`;
+    } else {
+      delete axios.defaults.headers.common["Authorization"];
+    }
+  }, [state.token]);
+
+  const logout = () => {
+    setState({ user: null, token: null });
+  };
+
   return (
-    <AuthContext.Provider value={[state, setState]}>
+    <AuthContext.Provider value={[state, setState, logout]}>
       {children}
     </AuthContext.Provider>
   );

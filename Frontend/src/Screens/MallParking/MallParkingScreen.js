@@ -1,126 +1,109 @@
-import React, { useState, useEffect } from "react";
-import { View, Text, Button, StyleSheet, Alert } from "react-native";
-import FooterMenu from "../../Components/Menus/FooterMenu";
-import { BarCodeScanner } from "expo-barcode-scanner";
-import axios from "axios"; // Make sure you have axios installed
+// screens/MallDetailsScreen.js
+import React, { useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  Button,
+  Alert,
+  ScrollView,
+  StyleSheet,
+  ActivityIndicator, // Import ActivityIndicator
+} from "react-native";
+import axios from "axios";
+import { useNavigation } from "@react-navigation/native";
 
-const MallParkingScreen = () => {
-  const [isParked, setIsParked] = useState(false);
-  const [hasPermission, setHasPermission] = useState(null);
-  const [scanned, setScanned] = useState(false);
-  const [startTime, setStartTime] = useState(null);
-  const [timeParked, setTimeParked] = useState(0); // in minutes
-  const [price, setPrice] = useState(0);
+const MallDetailsScreen = () => {
+  const [malls, setMalls] = useState([]); // State to hold mall details
+  const [loading, setLoading] = useState(true); // State to track loading
+  const navigation = useNavigation();
 
-  // Request camera permission
   useEffect(() => {
-    (async () => {
-      const { status } = await BarCodeScanner.requestPermissionsAsync();
-      setHasPermission(status === "granted");
-    })();
+    const fetchMallDetails = async () => {
+      try {
+        const response = await axios.get(`/mallparking/malldetails`); // Fetch all malls
+        setMalls(response.data.malls); // Update state with mall data
+      } catch (error) {
+        Alert.alert("Failed to load mall details");
+      } finally {
+        setLoading(false); // Stop loading indicator
+      }
+    };
+
+    fetchMallDetails();
   }, []);
 
-  // Handle barcode scan
-  const handleBarCodeScanned = ({ type, data }) => {
-    setScanned(true);
-    if (isParked) {
-      handlePunchOut(data); // Handle exit QR code
-    } else {
-      handlePunchIn(data); // Handle entry QR code
-    }
-  };
-
-  // Logic for punch-in
-  const handlePunchIn = async (data) => {
-    setIsParked(true);
-    setStartTime(new Date());
-    // Assuming the QR code data contains the mall ID or similar for backend
-    Alert.alert(
-      "Entry QR scanned!",
-      "You have successfully entered the parking."
-    );
-  };
-
-  // Logic for punch-out and payment
-  const handlePunchOut = async (data) => {
-    const endTime = new Date();
-    const duration = Math.floor((endTime - startTime) / 60000); // Calculate duration in minutes
-    setTimeParked(duration);
-
-    // Calculate price based on duration
-    const pricePer30Min = 10; // ₹10 per 30 minutes
-    const totalPrice = Math.ceil(duration / 30) * pricePer30Min; // Round up to the nearest 30 minutes
-    setPrice(totalPrice);
-
-    // Logic to deduct from wallet or ask for payment
-    const confirmation = await confirmPayment(totalPrice);
-    if (confirmation) {
-      setIsParked(false);
-      setStartTime(null);
-      setScanned(false);
-      Alert.alert(
-        "Exit QR scanned!",
-        `You have successfully exited. Total cost: ₹${totalPrice}`
-      );
-    }
-  };
-
-  const confirmPayment = (totalPrice) => {
-    return new Promise((resolve) => {
-      Alert.alert(
-        "Payment Required",
-        `Total amount to pay: ₹${totalPrice}. Confirm?`,
-        [
-          {
-            text: "Cancel",
-            onPress: () => resolve(false),
-            style: "cancel",
-          },
-          {
-            text: "Pay",
-            onPress: () => {
-              // Logic to deduct from user's wallet (API call or state management)
-              // For now, we will just resolve true
-              resolve(true);
-            },
-          },
-        ]
-      );
+  const handleViewQRCode = (mall) => {
+    // Navigate to view QR code screen with mall details
+    navigation.navigate("ViewQRCode", {
+      mallName: mall.name,
+      mallAddress: mall.address,
+      mallPricing: mall.pricing,
+      mallId: mall._id,
+      mallLocation: mall.location, // Include location details
     });
   };
 
-  if (hasPermission === null) {
-    return <Text>Requesting for camera permission</Text>;
-  }
-  if (hasPermission === false) {
-    return <Text>No access to camera</Text>;
-  }
-
   return (
     <View style={styles.container}>
-      <Text style={styles.status}>
-        {isParked ? "Vehicle is Parked" : "No Vehicle is Parked"}
-      </Text>
-      <Button
-        title={isParked ? "Punch Out" : "Punch In"}
-        onPress={isParked ? handlePunchOut : handlePunchIn}
-        disabled={scanned} // Disable button while scanning
-      />
-      <BarCodeScanner
-        onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
-        style={StyleSheet.absoluteFillObject}
-      />
-      {scanned && (
-        <Button title={"Tap to Scan Again"} onPress={() => setScanned(false)} />
+      {loading ? (
+        // Show loading indicator while data is being fetched
+        <ActivityIndicator size={80} color="#096c90" style={styles.loader} />
+      ) : (
+        <ScrollView>
+          {malls.map((mall) => (
+            <View key={mall._id} style={styles.mallCard}>
+              <Text style={styles.mallName}>{mall.name}</Text>
+              <Text style={styles.mallAddress}>{mall.address}</Text>
+              <Button
+                title="View More Details"
+                onPress={() => handleViewQRCode(mall)} // Navigate to view QR code with mall data
+                color="#096c90" // Button color
+              />
+            </View>
+          ))}
+        </ScrollView>
       )}
-      <FooterMenu />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, backgroundColor: "#021218" },
-  status: { fontSize: 20, marginBottom: 20, color: "white" },
+  container: {
+    flex: 1,
+    padding: 20,
+    backgroundColor: "#021218", // Background color
+  },
+  loader: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  mallCard: {
+    backgroundColor: "#0a1f29", // Card background color
+    borderRadius: 8,
+    borderColor: "#096c90",
+    borderWidth: 1,
+    padding: 15,
+    marginBottom: 15,
+    shadowColor: "#000", // Shadow for depth
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 1.5,
+    elevation: 2, // Elevation for Android
+  },
+  mallName: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#4A90E2", // Color for mall name
+  },
+  mallAddress: {
+    fontSize: 16,
+    color: "#777", // Softer color for address
+    marginVertical: 5,
+  },
 });
 
-export default MallParkingScreen;
+export default MallDetailsScreen;

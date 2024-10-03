@@ -1,21 +1,41 @@
-// Routes/MallParkingRoute.js
+// routes/mallParkingRoutes.js
 const express = require("express");
-const authenticateUser = require("../Middleware/authMiddleware");
-const {
-  createMallParking,
-  scanEntryQRCode,
-  scanExitQRCode,
-} = require("../Controllers/MallParkingController");
-
 const router = express.Router();
+const {
+  addMall,
+  getMallDetails,
+  getMallParkingDetails,
+  generateQRCode,
+  startParkingTimer,
+  exitParkingScanner,
+  getExistingQRCode,
+} = require("../controllers/mallParkingController");
+const authMiddleware = require("../middleware/authMiddleware");
 
-// Route to create a new mall parking entry
-router.post("/", createMallParking);
+// Add a new mall
+router.post("/add", addMall);
 
-// Route to scan entry QR code
-router.post("/entry", authenticateUser, scanEntryQRCode);
+// Fetch mall details
+router.get("/malldetails", getMallDetails);
 
-// Route to scan exit QR code
-router.post("/exit", authenticateUser, scanExitQRCode);
+// Fetch parking details (including pricing)
+router.get("/parking/:mallId", getMallParkingDetails);
+
+// Generate QR Code for mall parking
+router.post("/generate-qrcode/:mallId", authMiddleware, generateQRCode);
+
+// Fetch existing QR Code for parking session by mall ID and user ID
+// Fetch existing QR Code for parking session by mall ID and user ID
+router.get(
+  "/parkingsession/qrcode/:mallId/:vehicleId",
+  authMiddleware,
+  getExistingQRCode
+);
+
+// Scan QR Code to start timer
+router.post("/scan/start/:qrCode", authMiddleware, startParkingTimer);
+
+// Scan QR Code to stop timer and calculate price
+router.post("/scan/exit/:qrCode", authMiddleware, exitParkingScanner);
 
 module.exports = router;

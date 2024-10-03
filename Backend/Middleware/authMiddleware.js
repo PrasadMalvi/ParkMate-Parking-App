@@ -1,9 +1,10 @@
-// Middleware/authMiddleware.js
 const jwt = require("jsonwebtoken");
 const User = require("../Models/userModel");
 
 const authenticateUser = async (req, res, next) => {
-  const token = req.headers.authorization?.split(" ")[1]; // Bearer token
+  // Log the authorization header to debug
+
+  const token = req.headers.authorization?.split(" ")[1]; // Extract Bearer token
 
   if (!token) {
     return res
@@ -12,7 +13,10 @@ const authenticateUser = async (req, res, next) => {
   }
 
   try {
+    // Verify token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    // Check if user exists in the database
     const user = await User.findById(decoded._id).select("-password");
 
     if (!user) {
@@ -21,10 +25,12 @@ const authenticateUser = async (req, res, next) => {
         .json({ success: false, message: "Unauthorized, user not found" });
     }
 
+    // Attach user to request and proceed to next middleware
     req.user = user;
     next();
   } catch (error) {
-    res
+    console.error("Token verification error:", error);
+    return res
       .status(401)
       .json({ success: false, message: "Unauthorized, invalid token" });
   }

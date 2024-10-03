@@ -27,6 +27,7 @@ app.use("/auth", require("./Routes/UserRoutes"));
 app.use("/parking", require("./Routes/ParkingRoute"));
 app.use("/parkingspot", require("./Routes/ParkingSoptRoute"));
 app.use("/mallparking", require("./Routes/MallParkingRoute"));
+app.use("/vehicle", require("./Routes/VehicleRoute"));
 
 // Define the port
 const PORT = process.env.PORT || 5051;
