@@ -11,6 +11,7 @@ import { Picker } from "@react-native-picker/picker";
 import axios from "axios";
 import { AuthContext } from "../../Context/AuthContext";
 import FooterMenu from "../../Components/Menus/FooterMenu";
+import ConfirmBookSkeleton from "../../Components/Skeletons/ConfirmBookSkeleton";
 
 const ConfirmBookingScreen = ({ route, navigation }) => {
   const { spotId } = route.params;
@@ -29,7 +30,6 @@ const ConfirmBookingScreen = ({ route, navigation }) => {
           headers: { Authorization: `Bearer ${token}` },
         });
         setParkingSpot(data.data);
-        /*         console.log("Fetched Parking Spot:", data.data); */
       } catch (error) {
         console.log("Error fetching parking spot details:", error);
         Alert.alert("Error", "Failed to load parking spot details.");
@@ -85,12 +85,8 @@ const ConfirmBookingScreen = ({ route, navigation }) => {
     }
   };
 
-  if (isLoading) {
-    return (
-      <View style={styles.loaderContainer}>
-        <ActivityIndicator size={80} color="#096c90" />
-      </View>
-    );
+  if (loading) {
+    return <ConfirmBookSkeleton />; // Render skeleton during loading
   }
 
   if (!parkingSpot) {

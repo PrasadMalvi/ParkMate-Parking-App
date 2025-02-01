@@ -161,10 +161,27 @@ const getUserDataController = async (req, res) => {
     });
   }
 };
+const deleteAccountController = async (req, res) => {
+  const userId = req.user._id; // Assuming you set the user ID in the auth middleware
+
+  try {
+    const user = await userModel.findByIdAndDelete(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    return res
+      .status(200)
+      .json({ message: "User account deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting account:", error);
+    return res.status(500).json({ message: "Error deleting account" });
+  }
+};
 
 module.exports = {
   registerController,
   loginController,
   updateProfileController,
   getUserDataController, // Export the new controller
+  deleteAccountController,
 };

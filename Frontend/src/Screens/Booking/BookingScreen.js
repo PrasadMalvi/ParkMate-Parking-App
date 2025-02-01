@@ -7,12 +7,15 @@ import {
   TextInput,
   StyleSheet,
   Alert,
+  TouchableOpacity,
 } from "react-native";
 import axios from "axios";
 import { AuthContext } from "../../Context/AuthContext";
 import FooterMenu from "../../Components/Menus/FooterMenu";
+import AdvanceBookSkeleton from "../../Components/Skeletons/AdvanceBookSkeleton";
 
 const BookingScreen = ({ navigation }) => {
+  const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [parkingSpots, setParkingSpots] = useState([]);
   const [filteredSpots, setFilteredSpots] = useState([]);
@@ -22,6 +25,7 @@ const BookingScreen = ({ navigation }) => {
   // Fetch parking spots when component mounts or when searchQuery changes
   useEffect(() => {
     const fetchParkingSpots = async () => {
+      setLoading(true);
       try {
         const { token } = state;
         const { data } = await axios.get("/parkingspot/search", {
@@ -34,6 +38,8 @@ const BookingScreen = ({ navigation }) => {
       } catch (error) {
         console.log("Error fetching parking spots:", error);
         Alert.alert("Error", "Failed to fetch parking spots.");
+      } finally {
+        setLoading(false); // End loading
       }
     };
 
@@ -49,6 +55,13 @@ const BookingScreen = ({ navigation }) => {
     setFilteredSpots(filtered);
     setIsFull(filtered.length === 0);
   };
+  const handleViewMoreParking = () => {
+    navigation.navigate("AdvanceBookingHistory");
+  };
+
+  if (loading) {
+    return <AdvanceBookSkeleton />; // Render skeleton during loading
+  }
 
   return (
     <View style={styles.container}>
@@ -61,7 +74,11 @@ const BookingScreen = ({ navigation }) => {
         color={"#096c90"}
         onChangeText={handleSearch}
       />
-
+      <View style={styles.historyHeader}>
+        <TouchableOpacity onPress={handleViewMoreParking}>
+          <Text style={styles.viewMoreText}>Click here for Recent History</Text>
+        </TouchableOpacity>
+      </View>
       {/* If no spots are found */}
       {isFull ? (
         <Text style={styles.fullText}>No available parking spots</Text>
@@ -90,9 +107,6 @@ const BookingScreen = ({ navigation }) => {
           )}
         />
       )}
-
-      {/* Footer Menu */}
-      <FooterMenu />
     </View>
   );
 };
@@ -104,6 +118,16 @@ const styles = StyleSheet.create({
     backgroundColor: "#021218",
     paddingBottom: -10,
     paddingTop: 10,
+  },
+  historyHeader: {
+    width: 200,
+    borderRadius: 25,
+    marginLeft: 120,
+    marginBottom: 5,
+  },
+  viewMoreText: {
+    color: "#096c90",
+    textAlign: "center",
   },
   searchInput: {
     height: 40,

@@ -4,6 +4,7 @@ const {
   loginController,
   updateProfileController,
   getUserDataController,
+  deleteAccountController,
 } = require("../Controllers/UserController");
 const profileImageUpload = require("../Middleware/profileImageUpload");
 const authenticateUser = require("../Middleware/authMiddleware");
@@ -39,5 +40,7 @@ router.post(
   }
 );
 
-// Export router
+// Delete User Account || DELETE
+router.delete("/delete-account", authenticateUser, deleteAccountController);
+
 module.exports = router;

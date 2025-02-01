@@ -18,6 +18,10 @@ const parkingLocationSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  feedback: {
+    safetyOption: { type: String },
+    additionalFeedback: { type: String },
+  },
 });
 
 const ParkingLocation = mongoose.model(

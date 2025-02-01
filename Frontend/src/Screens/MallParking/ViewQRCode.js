@@ -8,16 +8,17 @@ import {
   Alert,
   TouchableOpacity,
   Button,
+  ActivityIndicator,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import axios from "axios";
 import { AuthContext } from "../../Context/AuthContext";
-import moment from "moment"; // For formatting time and calculating duration
+import moment from "moment";
+import ViewQRSkeleton from "../../Components/Skeletons/MallParkSkeleton";
 
 const QRCodeScreen = ({ route }) => {
   const [state] = useContext(AuthContext);
-  const { mallId, mallName, vehicleId, mallAddress, mallPricing } =
-    route.params;
+  const { mallId, mallName, mallAddress, mallPricing } = route.params;
   const [qrCodeUrl, setQrCodeUrl] = useState("");
   const [isExpanded, setIsExpanded] = useState(false);
   const [vehicles, setVehicles] = useState([]);
@@ -26,14 +27,14 @@ const QRCodeScreen = ({ route }) => {
   const { token } = state;
 
   // Timer state
-  const [timer, setTimer] = useState(null);
   const [startTime, setStartTime] = useState(null);
-  const [duration, setDuration] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [elapsedTime, setElapsedTime] = useState(0); // New state for elapsed time
 
-  // In QRCodeScreen.js
   useEffect(() => {
     const fetchVehicles = async () => {
       try {
+        setLoading(true); // Start loading
         const response = await axios.get(`/vehicle/vehicles`, {
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -41,6 +42,8 @@ const QRCodeScreen = ({ route }) => {
       } catch (error) {
         console.error("Error fetching vehicles:", error);
         Alert.alert("Error fetching vehicles.");
+      } finally {
+        setLoading(false); // Stop loading
       }
     };
 
@@ -55,6 +58,7 @@ const QRCodeScreen = ({ route }) => {
 
   const fetchExistingQRCode = async () => {
     try {
+      setLoading(true);
       const response = await axios.get(
         `/mallparking/parkingsession/qrcode/${mallId}/${selectedVehicle}`,
         {
@@ -75,20 +79,10 @@ const QRCodeScreen = ({ route }) => {
       }
     } catch (error) {
       console.error("Error fetching existing QR code:", error);
-      if (error.response && error.response.status === 500) {
-        Alert.alert("Internal Server Error");
-      } else {
-        Alert.alert("Error fetching existing QR code.");
-      }
+      Alert.alert("Error fetching existing QR code.");
+    } finally {
+      setLoading(false);
     }
-  };
-
-  // Timer calculation function
-  const calculateDuration = (start) => {
-    const now = moment();
-    const startMoment = moment(start);
-    const diffInMinutes = now.diff(startMoment, "minutes");
-    setDuration(diffInMinutes);
   };
 
   const handleGenerateQRCode = async () => {
@@ -98,6 +92,7 @@ const QRCodeScreen = ({ route }) => {
     }
 
     try {
+      setLoading(true); // Start loading
       const response = await axios.post(
         `/mallparking/generate-qrcode/${mallId}`,
         { vehicleId: selectedVehicle },
@@ -108,51 +103,30 @@ const QRCodeScreen = ({ route }) => {
       setStartTime(new Date()); // Set start time when QR code is generated
     } catch (error) {
       Alert.alert("Failed to generate QR Code");
+    } finally {
+      setLoading(false); // Stop loading
     }
   };
 
-  // Start the parking timer when the entry QR code is scanned
-  const startParkingTimer = () => {
-    if (!startTime) return;
+  useEffect(() => {
+    // Timer to calculate elapsed time
+    const timerInterval = setInterval(() => {
+      if (startTime) {
+        const now = new Date();
+        const elapsed = Math.floor((now - startTime) / 60000); // Calculate elapsed time in minutes
+        setElapsedTime(elapsed);
+      }
+    }, 1000); // Update every second
 
-    setTimer(setInterval(() => calculateDuration(startTime), 60000)); // Update every minute
-  };
-
-  // Handle stopping the parking when the exit QR code is scanned
-  const handleStopParking = async () => {
-    try {
-      const response = await axios.post(
-        `/mallparking/scan/exit/${qrCodeUrl}`,
-        {},
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-
-      // Stop the timer and clear interval
-      clearInterval(timer);
-      setTimer(null);
-
-      // Duration and price would be handled by the API response
-      const { duration, price } = response.data;
-      setDuration(duration);
-
-      Alert.alert(
-        "Parking session ended",
-        `Duration: ${duration} minutes\n Price: ₹${price}`
-      );
-    } catch (error) {
-      Alert.alert("Failed to stop parking");
-    }
-  };
-
-  const handleVehicleSelection = (itemValue) => {
-    setSelectedVehicle(itemValue);
-    setIsQrCodeReady(false); // Reset QR code when vehicle is changed
-  };
+    return () => clearInterval(timerInterval); // Clean up interval on unmount
+  }, [startTime]);
 
   const handleQRCodePress = () => {
     setIsExpanded(!isExpanded);
   };
-
+  if (loading) {
+    return <ViewQRSkeleton />; // Render skeleton during loading
+  }
   return (
     <ScrollView style={styles.container}>
       {/* Mall details */}
@@ -169,11 +143,17 @@ const QRCodeScreen = ({ route }) => {
 
       {/* Vehicle selection */}
       <Text style={styles.vehicleTitle}>Select Vehicle:</Text>
-      {vehicles.length > 0 ? (
+      {loading ? (
+        <ActivityIndicator size="large" color="#4A90E2" />
+      ) : vehicles.length > 0 ? (
         <Picker
           selectedValue={selectedVehicle}
           style={styles.picker}
-          onValueChange={handleVehicleSelection}
+          onValueChange={(itemValue) => {
+            setSelectedVehicle(itemValue);
+            setIsQrCodeReady(false); // Reset QR code when vehicle is changed
+            setElapsedTime(0); // Reset elapsed time when changing vehicle
+          }}
         >
           <Picker.Item label="Select your vehicle" value={null} />
           {vehicles.map((vehicle) => (
@@ -193,7 +173,7 @@ const QRCodeScreen = ({ route }) => {
         title="Generate QR Code"
         onPress={handleGenerateQRCode}
         color="#4A90E2"
-        disabled={qrCodeUrl !== ""} // Only disable if a QR code already exists
+        disabled={qrCodeUrl !== "" || loading} // Disable if QR code already exists or loading
       />
 
       {/* Display QR Code if available */}
@@ -205,27 +185,34 @@ const QRCodeScreen = ({ route }) => {
           <Text style={styles.tapText}>
             Tap to {isExpanded ? "hide" : "view"} QR Code
           </Text>
+
+          {/* Small round QR code preview */}
           <Image
             source={{ uri: qrCodeUrl }}
-            style={isExpanded ? styles.qrCodeExpanded : styles.qrCode}
+            style={!isExpanded ? styles.qrCodeSmall : styles.qrCodeHidden}
           />
-          {/* Display start time and timer */}
-          {startTime && (
-            <View style={styles.timerContainer}>
-              <Text style={styles.timerText}>
-                Parking started at: {moment(startTime).format("LT")}
-              </Text>
-              <Text style={styles.timerText}>
-                Time Elapsed:{" "}
-                {duration ? `${duration} minutes` : "Calculating..."}
-              </Text>
-            </View>
+
+          {/* Full QR code on tap */}
+          {isExpanded && (
+            <Image source={{ uri: qrCodeUrl }} style={styles.qrCodeExpanded} />
           )}
         </TouchableOpacity>
       ) : (
         <Text style={styles.infoText}>
           {isQrCodeReady ? "Generating QR Code..." : ""}
         </Text>
+      )}
+
+      {/* Display start time and timer */}
+      {startTime && (
+        <View style={styles.timerContainer}>
+          <Text style={styles.timerText}>
+            Parking started at: {moment(startTime).format("LT")}
+          </Text>
+          <Text style={styles.timerText}>
+            Total Duration: {elapsedTime} minutes
+          </Text>
+        </View>
       )}
     </ScrollView>
   );
@@ -280,33 +267,40 @@ const styles = StyleSheet.create({
   },
   qrContainer: {
     alignItems: "center",
-    marginTop: 20,
-    marginBottom: 50,
+    marginVertical: 20,
   },
-  tapText: {
-    color: "#fff",
-    marginBottom: 10,
-  },
-  qrCode: {
-    width: 200,
-    height: 200,
-    display: "none",
+  qrCodeSmall: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    borderWidth: 2,
+    borderColor: "#4A90E2",
   },
   qrCodeExpanded: {
-    width: 200,
-    height: 200,
+    width: 300,
+    height: 300,
+    marginTop: -300,
+    zIndex: 2,
   },
-  timerContainer: {
-    marginTop: 20,
+  qrCodeHidden: {
+    display: "none",
   },
-  timerText: {
+  tapText: {
     fontSize: 16,
-    color: "#fff",
+    color: "#4A90E2",
+    marginBottom: 10,
   },
   infoText: {
     fontSize: 16,
     color: "#fff",
-    marginTop: 10,
+  },
+  timerContainer: {
+    marginTop: 20,
+    alignItems: "center",
+  },
+  timerText: {
+    fontSize: 16,
+    color: "#fff",
   },
 });
 

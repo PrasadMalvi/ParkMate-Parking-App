@@ -1,31 +1,5 @@
-import Register from "./src/Screens/Auth/Register";
-import Login from "./src/Screens/Auth/Login";
 import { NavigationContainer } from "@react-navigation/native";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import HomeScreen from "./src/Screens/Home/HomeScreen";
-import { AuthContext, AuthProvider } from "./src/Context/AuthContext";
-import ParkingLocationScreen from "./src/Screens/Parking/ParkingLocationScreen";
-import ParkingHistory from "./src/Screens/Parking/ParkingHistory";
-import BookingScreen from "./src/Screens/Booking/BookingScreen";
-import MallParkingScreen from "./src/Screens/MallParking/MallParkingScreen";
-import FastTag from "./src/Screens/FastTag/FastTagScreen";
-import WalletScreen from "./src/Screens/Payment/WalletScreen";
-import PaymentHistory from "./src/Screens/Payment/PaymentHistory";
-import PaymentScreen from "./src/Screens/Payment/PaymentScreen";
-import HelpAndSupport from "./src/Screens/Help&Support/HelpAndSupport";
-import ProfileScreen from "./src/Screens/Profile/ProfileScreen";
-import HeaderMenu from "./src/Components/Menus/HeaderMenu";
-import ParkedLocation from "./src/Screens/Parking/ParkedLocation";
-import ConfirmBookingScreen from "./src/Screens/Booking/ConfirmBookingScreen";
-import AdvanceBookingHistory from "./src/Screens/Booking/AdvanceBookingHistory";
-import SpotLocation from "./src/Screens/Booking/SpotLocation";
-import EditProfile from "./src/Screens/Profile/EditProfile";
-import MyReviews from "./src/Screens/Profile/MyReviews";
-import AccountSettings from "./src/Screens/Profile/AccountSettings";
-import { useContext } from "react";
 import RootNavigation from "./Navigation";
-
-import { View, Text } from "react-native";
 import React from "react";
 
 const App = () => {

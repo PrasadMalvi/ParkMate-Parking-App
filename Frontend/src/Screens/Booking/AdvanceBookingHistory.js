@@ -94,7 +94,6 @@ const AdvanceBookingHistory = ({ navigation }) => {
           </View>
         )}
       />
-      <FooterMenu style={styles.ABHFooter} />
     </View>
   );
 };

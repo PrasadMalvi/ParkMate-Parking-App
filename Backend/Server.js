@@ -24,10 +24,14 @@ app.use(morgan("dev"));
 app.use("/profile-pics", express.static(path.join(__dirname, "profile-pics")));
 // Routes
 app.use("/auth", require("./Routes/UserRoutes"));
+app.use("/admin", require("./Routes/AdminRoutes/AdminRoute"));
 app.use("/parking", require("./Routes/ParkingRoute"));
-app.use("/parkingspot", require("./Routes/ParkingSoptRoute"));
+app.use("/parkingspot", require("./Routes/AdvanceBookRoute"));
+app.use("/adminparkingspot", require("./Routes/AdminRoutes/AdvanceBookRoute"));
+app.use("/adminmallparking", require("./Routes/AdminRoutes/MallParking"));
 app.use("/mallparking", require("./Routes/MallParkingRoute"));
 app.use("/vehicle", require("./Routes/VehicleRoute"));
+app.use("/fasttag", require("./Routes/FastTagRoute"));
 
 // Define the port
 const PORT = process.env.PORT || 5051;

@@ -13,11 +13,12 @@ import * as ImagePicker from "expo-image-picker";
 import upload_area from "../../../assets/user.png";
 import FooterMenu from "../../Components/Menus/FooterMenu";
 import { AuthContext } from "../../Context/AuthContext";
+import AsyncStorage from "@react-native-async-storage/async-storage"; // Import AsyncStorage
 
 const ProfileScreen = ({ navigation }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [state] = useContext(AuthContext);
+  const [state, dispatch] = useContext(AuthContext);
   const { token } = state;
 
   useEffect(() => {
@@ -42,8 +43,6 @@ const ProfileScreen = ({ navigation }) => {
 
     fetchUserData();
   }, [token]);
-
-  useEffect(() => {}, [user]);
 
   const handleUpdateProfile = () => {
     navigation.navigate("EditProfile", { user });
@@ -123,6 +122,29 @@ const ProfileScreen = ({ navigation }) => {
     }
   };
 
+  const handleLogout = () => {
+    Alert.alert(
+      "Confirm Logout",
+      "Are you sure you want to logout?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Logout",
+          onPress: async () => {
+            // Clear the token from AsyncStorage
+            await AsyncStorage.removeItem("token"); // Assuming the token is stored under this key
+            dispatch({ type: "LOGOUT" }); // Call logout action
+            navigation.navigate("Login"); // Navigate to login screen
+          },
+        },
+      ],
+      { cancelable: false }
+    );
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -136,9 +158,11 @@ const ProfileScreen = ({ navigation }) => {
             {user && user.name ? (
               <Image
                 style={styles.profilePicture}
-                source={{
-                  uri: user?.profilePicture ? user.profilePicture : upload_area,
-                }}
+                source={
+                  user && user.profilePicture
+                    ? { uri: String(user.profilePicture) } // Ensure it's a string
+                    : upload_area // Default/fallback image
+                }
                 onError={(e) =>
                   console.log("Error loading image:", e.nativeEvent.error)
                 }
@@ -189,11 +213,13 @@ const ProfileScreen = ({ navigation }) => {
               >
                 <Text style={styles.buttonText}>Settings</Text>
               </TouchableOpacity>
+              <TouchableOpacity style={styles.button} onPress={handleLogout}>
+                <Text style={styles.buttonText}>Logout</Text>
+              </TouchableOpacity>
             </View>
           </>
         )}
       </View>
-      <FooterMenu />
     </View>
   );
 };

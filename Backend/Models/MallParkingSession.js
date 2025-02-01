@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const ParkingSessionSchema = new Schema({
+const MallParkingSessionSchema = new Schema({
   vehicleId: { type: Schema.Types.ObjectId, ref: "Vehicle", required: true },
   mallId: { type: Schema.Types.ObjectId, ref: "MallParking", required: true },
   qrCodeUrl: { type: String, required: true },
@@ -13,5 +13,8 @@ const ParkingSessionSchema = new Schema({
   createdAt: { type: Date, default: Date.now },
 });
 
-const ParkingSession = mongoose.model("ParkingSession", ParkingSessionSchema);
+const ParkingSession = mongoose.model(
+  "MallParkingSession",
+  MallParkingSessionSchema
+);
 module.exports = ParkingSession;

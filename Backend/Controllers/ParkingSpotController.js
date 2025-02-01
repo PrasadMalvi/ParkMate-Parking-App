@@ -2,52 +2,6 @@
 const ParkingSpot = require("../Models/ParkingSpot");
 const AdvanceBooking = require("../Models/AdvanceBook");
 const mongoose = require("mongoose");
-// Create a new parking spot (no token required)
-const createParkingSpot = async (req, res) => {
-  try {
-    const {
-      locationName,
-      fullAddress,
-      latitude,
-      longitude,
-      timeSlots,
-      vehicleTypes,
-    } = req.body;
-
-    if (
-      !locationName ||
-      !fullAddress ||
-      latitude === undefined ||
-      longitude === undefined ||
-      !timeSlots ||
-      !vehicleTypes
-    ) {
-      return res
-        .status(400)
-        .json({ success: false, message: "All fields are required" });
-    }
-
-    const newSpot = new ParkingSpot({
-      locationName,
-      fullAddress,
-      latitude,
-      longitude,
-      timeSlots,
-      vehicleTypes,
-    });
-
-    await newSpot.save();
-    return res
-      .status(201)
-      .json({ success: true, message: "Parking spot created", data: newSpot });
-  } catch (error) {
-    return res.status(500).json({
-      success: false,
-      message: "Error creating parking spot",
-      error: error.message,
-    });
-  }
-};
 
 // Search for parking spots by name (token required)
 const searchParkingSpots = async (req, res) => {
@@ -76,30 +30,6 @@ const searchParkingSpots = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: "Error searching parking spots",
-      error: error.message,
-    });
-  }
-};
-
-// Get a parking spot by ID (no token required)
-const getParkingSpotById = async (req, res) => {
-  try {
-    const spot = await ParkingSpot.findById(req.params.id);
-
-    if (!spot) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Parking spot not found" });
-    }
-
-    return res.json({
-      success: true,
-      data: spot, // Ensure the entire parking spot object is sent, including timeSlots
-    });
-  } catch (error) {
-    return res.status(500).json({
-      success: false,
-      message: "Error retrieving parking spot",
       error: error.message,
     });
   }
@@ -255,10 +185,32 @@ const getAdvanceBookingHistory = async (req, res) => {
   }
 };
 
+const getParkingSpotById = async (req, res) => {
+  try {
+    const spot = await ParkingSpot.findById(req.params.id);
+
+    if (!spot) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Parking spot not found" });
+    }
+
+    return res.json({
+      success: true,
+      data: spot, // Ensure the entire parking spot object is sent, including timeSlots
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Error retrieving parking spot",
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
-  createParkingSpot,
   searchParkingSpots,
-  getParkingSpotById,
   bookParkingSpot,
+  getParkingSpotById,
   getAdvanceBookingHistory,
 };

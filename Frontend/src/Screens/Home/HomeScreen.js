@@ -1,165 +1,262 @@
-import React from "react";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
-import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
-import FooterMenu from "../../Components/Menus/FooterMenu";
+import {
+  View,
+  StyleSheet,
+  SafeAreaView,
+  Text,
+  TouchableOpacity,
+  FlatList,
+  ActivityIndicator,
+  TextInput,
+} from "react-native";
+import React, { useState, useEffect, useContext } from "react";
 import HeaderMenu from "../../Components/Menus/HeaderMenu";
+import FooterMenu from "../../Components/Menus/FooterMenu";
+import ParkingLocationScreen from "../Parking/ParkingLocationScreen"; // Reusing the screen
+import axios from "axios";
+import { AuthContext } from "../../Context/AuthContext";
+import { useNavigation } from "@react-navigation/native";
+import FontAwesome5 from "react-native-vector-icons/FontAwesome5"; // Correct import
+import { MaterialCommunityIcons } from "@expo/vector-icons"; // Import MaterialCommunityIcons for map icon
+import HomeSkeleton from "../../Components/Skeletons/HomeSkeleton";
 
-const HomeScreen = ({ navigation }) => {
+const HomeScreen = () => {
+  const [parkingHistory, setParkingHistory] = useState([]);
+  const [loading, setLoading] = useState(true); // State to manage loading
+  const [state] = useContext(AuthContext);
+  const navigation = useNavigation();
+
+  // Fetching recent parking history (top 3)
+  useEffect(() => {
+    const fetchParkingHistory = async () => {
+      try {
+        const { token } = state;
+        const response = await axios.get(`/parking/parkinghistory`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (response.data.success) {
+          // Only take the first 3 entries for the recent history
+          setParkingHistory(response.data.data.slice(0, 3));
+        }
+      } catch (error) {
+        console.error("Error fetching parking history:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchParkingHistory();
+  }, [state]);
+
+  const handleViewMoreParking = () => {
+    navigation.navigate("ParkingHistory");
+  };
+
+  const handleSearchPress = () => {
+    navigation.navigate("BookingScreen");
+  };
+
+  if (loading) {
+    return <HomeSkeleton />; // Render skeleton during loading
+  }
+
   return (
-    <View style={styles.container}>
-      <HeaderMenu />
-      <View style={styles.buttonRow}>
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => navigation.navigate("ParkingLocationScreen")}
-        >
-          <FontAwesome5
-            name="parking"
-            color={"white"}
-            style={styles.iconStyle}
-          />
-          <Text style={styles.buttonText}>Park Here</Text>
-        </TouchableOpacity>
+    <SafeAreaView style={styles.container}>
+      {/* Top Header */}
+      <HeaderMenu style={styles.headerStyle} />
 
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => navigation.navigate("BookingScreen")}
-        >
-          <FontAwesome5
-            name="calendar-plus"
-            color={"white"}
-            style={styles.iconStyle}
-          />
-          <Text style={styles.buttonText}>Advance Book</Text>
-        </TouchableOpacity>
+      {/* Half-screen Parking Location */}
+      <View style={styles.parkingLocationContainer}>
+        <ParkingLocationScreen />
       </View>
 
-      <View style={styles.buttonRow}>
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => navigation.navigate("MallParkingScreen")}
-        >
-          <FontAwesome5
-            name="building"
-            color={"white"}
-            style={styles.iconStyle}
-          />
-          <Text style={styles.buttonText}>Mall Parking</Text>
-        </TouchableOpacity>
+      {/* Another half screen: Recent Parking History */}
+      <View style={styles.historySection}>
+        {/* Search Bar inside History Section */}
+        <View style={styles.searchContainer}>
+          <TouchableOpacity
+            onPress={handleSearchPress}
+            style={styles.searchBar}
+          >
+            <TextInput
+              style={styles.searchInput}
+              placeholder="Search for Advance Book"
+              placeholderTextColor={"#096c90"}
+              editable={false} // To disable typing, as the user will navigate to BookingScreen
+            />
+          </TouchableOpacity>
+        </View>
+        {/* Bottom Footer */}
+        <Text style={styles.historyTitle1}>Explore More</Text>
 
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => navigation.navigate("FastTag")}
-        >
-          <FontAwesome5 name="road" color={"white"} style={styles.iconStyle} />
-          <Text style={styles.buttonText}>FastTag</Text>
-        </TouchableOpacity>
+        <FooterMenu />
+        <View style={styles.historyHeader}>
+          <Text style={styles.historyTitle}>Recents</Text>
+          <TouchableOpacity onPress={handleViewMoreParking}>
+            <Text style={styles.viewMoreText}>View More</Text>
+          </TouchableOpacity>
+        </View>
+
+        {loading ? (
+          <ActivityIndicator size="large" color="#096c90" />
+        ) : parkingHistory.length === 0 ? (
+          <Text style={styles.noHistoryText}>No parking history available</Text>
+        ) : (
+          <FlatList
+            style={styles.historybox}
+            data={parkingHistory}
+            keyExtractor={(item) => item._id.toString()}
+            renderItem={({ item }) => (
+              <View style={styles.historyItem}>
+                <Text style={styles.location}>
+                  {new Date(item.date).toLocaleDateString()} {" \n"}
+                  {new Date(item.date).toLocaleTimeString()}
+                </Text>
+                <MaterialCommunityIcons
+                  name="map-marker-outline"
+                  size={24}
+                  color="#096c90"
+                  marginLeft={150}
+                  marginTop={-30}
+                />
+                <Text
+                  style={styles.viewOnMap}
+                  onPress={() =>
+                    navigation.navigate("ParkedLocation", {
+                      parkingLocation: item,
+                    })
+                  }
+                >
+                  View on Map
+                </Text>
+                {/* Horizontal line separator */}
+                <View style={styles.separator} />
+              </View>
+            )}
+          />
+        )}
       </View>
-
-      <View style={styles.moreOptions}>
-        <TouchableOpacity
-          style={styles.moreOptionButton}
-          onPress={() => navigation.navigate("ParkingHistory")}
-        >
-          <FontAwesome5
-            name="history"
-            color={"white"}
-            style={styles.iconStyle1}
-          />
-          <Text style={styles.buttonText1}>Parking History</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.moreOptionButton}
-          onPress={() => navigation.navigate("PaymentHistory")}
-        >
-          <FontAwesome5
-            name="credit-card"
-            color={"white"}
-            style={styles.iconStyle1}
-          />
-          <Text style={styles.buttonText1}>Payment Methods</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.moreOptionButton}
-          onPress={() => navigation.navigate("AdvanceBookingHistory")}
-        >
-          <FontAwesome5
-            name="calendar-check"
-            color={"white"}
-            style={styles.iconStyle1}
-          />
-          <Text style={styles.buttonText1}>Advance Booking History</Text>
-        </TouchableOpacity>
-      </View>
-      <FooterMenu />
-    </View>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "transparent",
     padding: 20,
-    backgroundColor: "#021218",
+    paddingBottom: -50,
   },
-  headerText: {
-    fontSize: 24,
-    fontWeight: "bold",
-    textAlign: "center",
-    marginBottom: 20,
+  headerStyle: {
+    // Add custom styles for header if needed
   },
-  buttonRow: {
+  searchContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 10, // Space between search bar and parking history items
+    marginTop: 10,
+  },
+  searchBar: {
+    flex: 1,
+    backgroundColor: "#0a1f29",
+    borderRadius: 15,
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    marginRight: 10,
+    shadowColor: "#000", // Shadow effect
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 5, // For Android shadow
+    height: 40,
+  },
+  searchInput: {
+    color: "#ffffff", // Text color
+    fontSize: 15,
+  },
+  profileIcon: {
+    // Adjust icon positioning if needed
+    fontSize: 35,
+    marginBottom: 2,
+  },
+  parkingLocationContainer: {
+    flex: 1,
+    borderBottomWidth: 1,
+    borderColor: "#ddd",
+    width: 400,
+    marginLeft: -20,
+    marginTop: -25,
+  },
+  historySection: {
+    flex: 1,
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    backgroundColor: "#1b262f",
+    marginTop: -100,
+    width: 360,
+    marginLeft: -20,
+    borderTopLeftRadius: 15,
+    borderTopRightRadius: 15,
+  },
+  historyHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginBottom: 20,
-    height: 100,
-    width: 350,
-    marginLeft: -15,
-  },
-  button: {
-    flex: 1,
-    backgroundColor: "#6fd2f6",
-    borderRadius: 10,
-    padding: 20,
     alignItems: "center",
-    marginHorizontal: 10,
+    marginBottom: 5,
+    marginTop: 5,
+    paddingLeft: 10,
+    paddingRight: 10,
   },
-  buttonText: {
-    color: "#096c90",
-    fontSize: 16,
-    marginTop: 10,
-  },
-  buttonText1: {
-    color: "white",
-    fontSize: 16,
-    marginTop: 10,
-  },
-  iconStyle: {
-    fontSize: 30,
-    color: "#064860",
-  },
-  iconStyle1: {
-    fontSize: 30,
-    color: "white",
-  },
-  moreOptions: {
-    marginTop: 0,
-    marginBottom: 45,
-  },
-  moreOptionsText: {
-    fontSize: 20,
+  historyTitle: {
+    fontSize: 15,
     fontWeight: "bold",
-    marginBottom: 10,
+    color: "#096c90",
+    marginTop: 5,
+  },
+  historyTitle1: {
+    fontSize: 15,
+    fontWeight: "bold",
+    color: "#096c90",
+    marginTop: 5,
+    paddingLeft: 10,
+    marginBottom: -3,
+  },
+  viewMoreText: {
+    color: "#096c90",
+  },
+  historyItem: {
+    padding: 15,
+    borderRadius: 15,
+    height: 70,
+    paddingTop: 25,
+  },
+  historybox: {
+    borderRadius: 15,
+    backgroundColor: "#0a1f29",
+    marginBottom: -2,
+  },
+  location: {
+    color: "#096c90",
+    fontWeight: "bold",
+    paddingLeft: 20,
+    marginTop: -5,
+  },
+  viewOnMap: {
+    color: "#096c90",
+    marginTop: -23,
+    marginLeft: 180,
+  },
+  noHistoryText: {
+    color: "#ffffff",
     textAlign: "center",
   },
-  moreOptionButton: {
-    backgroundColor: "#096c90",
-    borderRadius: 10,
-    padding: 15,
-    alignItems: "center",
-    marginVertical: 5,
+  separator: {
+    width: "80%",
+    marginLeft: 20,
+    marginTop: 30,
+    height: 1,
+    backgroundColor: "#096c90", // Color of the separator line
+    marginVertical: 5, // Space between items
   },
 });
 

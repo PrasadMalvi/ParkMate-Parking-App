@@ -24,6 +24,9 @@ import { useContext } from "react";
 import { AuthContext } from "../../Context/AuthContext";
 import MyVehicleDetails from "../../Screens/Profile/MyVehicleDetails";
 import ViewQRCode from "../../Screens/MallParking/ViewQRCode";
+import ViewFastTagQRCode from "../../Screens/FastTag/ViewFastTagQRCode";
+import MallParkingHistoryScreen from "../../Screens/MallParking/MallParkingHistory";
+import FastTagHistoryScreen from "../../Screens/FastTag/FastTagHistory";
 
 const ScreenMenu = () => {
   const [state, setState] = useContext(AuthContext);
@@ -193,6 +196,22 @@ const ScreenMenu = () => {
             }}
           />
           <Stack.Screen
+            name="ViewFastTagQRCode"
+            component={ViewFastTagQRCode}
+            options={{
+              title: "Fast Tag",
+              headerStyle: {
+                backgroundColor: "#6fd2f6",
+                height: 60,
+              },
+              headerTitleStyle: {
+                fontSize: 18,
+                fontWeight: "bold",
+                color: "#021218",
+              },
+            }}
+          />
+          <Stack.Screen
             name="WalletScreen"
             component={WalletScreen}
             options={{
@@ -326,6 +345,38 @@ const ScreenMenu = () => {
           <Stack.Screen
             name="MyVehicleDetails"
             component={MyVehicleDetails}
+            options={{
+              title: "My Spot Location",
+              headerStyle: {
+                backgroundColor: "#6fd2f6",
+                height: 60,
+              },
+              headerTitleStyle: {
+                fontSize: 18,
+                fontWeight: "bold",
+                color: "#021218",
+              },
+            }}
+          />
+          <Stack.Screen
+            name="MallParkingHistory"
+            component={MallParkingHistoryScreen}
+            options={{
+              title: "My Spot Location",
+              headerStyle: {
+                backgroundColor: "#6fd2f6",
+                height: 60,
+              },
+              headerTitleStyle: {
+                fontSize: 18,
+                fontWeight: "bold",
+                color: "#021218",
+              },
+            }}
+          />
+          <Stack.Screen
+            name="FastTagHistory"
+            component={FastTagHistoryScreen}
             options={{
               title: "My Spot Location",
               headerStyle: {

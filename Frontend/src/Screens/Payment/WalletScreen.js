@@ -11,7 +11,6 @@ const WalletScreen = ({ navigation }) => {
         title="Add Money"
         onPress={() => navigation.navigate("PaymentScreen")}
       />
-      <FooterMenu />
     </View>
   );
 };

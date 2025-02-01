@@ -14,7 +14,6 @@ const MallParkingSchema = new Schema({
     longitude: { type: Number, required: true },
   },
   address: { type: String, required: true },
-  qrCode: { type: String }, // Optional: Generated QR Code for the mall
   pricing: [PricingSchema],
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },

@@ -93,9 +93,6 @@ const ParkingHistoryScreen = () => {
           )}
         />
       )}
-
-      {/* Footer Menu */}
-      <FooterMenu />
     </View>
   );
 };

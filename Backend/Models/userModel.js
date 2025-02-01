@@ -24,7 +24,7 @@ const Users = new mongoose.Schema(
     },
     address: {
       type: String,
-      required: [true, "Please Enter Address"],
+      required: [false, "Please Enter Address"],
     },
   },
   { timestamps: true }
