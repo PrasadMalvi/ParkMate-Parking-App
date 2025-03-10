@@ -13,7 +13,7 @@ const AuthProvider = ({ children }) => {
   });
 
   // Set default Axios settings
-  axios.defaults.baseURL = "http://192.168.0.102:5050";
+  axios.defaults.baseURL = "http://192.168.0.100:5050";
 
   // Load local storage data on initial render
   useEffect(() => {
