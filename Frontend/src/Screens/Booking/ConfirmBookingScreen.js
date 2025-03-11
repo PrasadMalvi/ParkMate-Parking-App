@@ -17,6 +17,7 @@ const ConfirmBookingScreen = ({ route, navigation }) => {
   const { spotId } = route.params;
   const [parkingSpot, setParkingSpot] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [isBooking, setIsBooking] = useState(false);
   const [vehicleType, setVehicleType] = useState("");
   const [selectedTimeSlot, setSelectedTimeSlot] = useState("");

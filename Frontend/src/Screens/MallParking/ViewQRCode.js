@@ -61,9 +61,7 @@ const QRCodeScreen = ({ route }) => {
       setLoading(true);
       const response = await axios.get(
         `/mallparking/parkingsession/qrcode/${mallId}/${selectedVehicle}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
 
       if (response.data.qrCodeUrl) {
@@ -73,13 +71,17 @@ const QRCodeScreen = ({ route }) => {
           response.data.startTime ? new Date(response.data.startTime) : null
         );
       } else {
-        setQrCodeUrl(""); // Reset QR code if none exists
+        setQrCodeUrl(""); // Reset QR code
         setIsQrCodeReady(false);
         Alert.alert("No QR code found for this mall.");
       }
     } catch (error) {
-      console.error("Error fetching existing QR code:", error);
-      Alert.alert("Error fetching existing QR code.");
+      console.log(
+        "Error fetching existing QR code:",
+        error.response?.data || error.message
+      );
+      setQrCodeUrl(""); // Reset QR code
+      setIsQrCodeReady(false);
     } finally {
       setLoading(false);
     }

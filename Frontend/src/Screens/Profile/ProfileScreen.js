@@ -11,9 +11,8 @@ import {
 import axios from "axios";
 import * as ImagePicker from "expo-image-picker";
 import upload_area from "../../../assets/user.png";
-import FooterMenu from "../../Components/Menus/FooterMenu";
 import { AuthContext } from "../../Context/AuthContext";
-import AsyncStorage from "@react-native-async-storage/async-storage"; // Import AsyncStorage
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const ProfileScreen = ({ navigation }) => {
   const [user, setUser] = useState(null);
@@ -160,8 +159,8 @@ const ProfileScreen = ({ navigation }) => {
                 style={styles.profilePicture}
                 source={
                   user && user.profilePicture
-                    ? { uri: String(user.profilePicture) } // Ensure it's a string
-                    : upload_area // Default/fallback image
+                    ? { uri: String(user.profilePicture) }
+                    : upload_area
                 }
                 onError={(e) =>
                   console.log("Error loading image:", e.nativeEvent.error)

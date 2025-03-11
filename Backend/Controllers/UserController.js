@@ -103,10 +103,19 @@ const loginController = async (req, res) => {
     });
   }
 };
+
 const updateProfileController = async (req, res) => {
   try {
     const userId = req.user.id;
-    const { name, email, address, profilePicture } = req.body;
+    let { name, email, address, profilePicture } = req.body;
+
+    // Ensure only the filename is stored, not the full URL
+    if (profilePicture && profilePicture.startsWith("http")) {
+      return res.status(400).send({
+        success: false,
+        message: "Invalid profile picture format. Send only the filename.",
+      });
+    }
 
     const updatedUser = await userModel.findByIdAndUpdate(
       userId,
@@ -114,7 +123,9 @@ const updateProfileController = async (req, res) => {
         name,
         email,
         address,
-        profilePicture, // Save the URL of the profile picture
+        profilePicture: profilePicture
+          ? `/profile-pics/${profilePicture}`
+          : undefined,
       },
       { new: true }
     );
@@ -148,9 +159,15 @@ const getUserDataController = async (req, res) => {
       });
     }
 
+    // Construct full URL for profile picture dynamically
+    const serverUrl = `${req.protocol}://${req.get("host")}`;
+    const fullImageUrl = user.profilePicture
+      ? `${serverUrl}${user.profilePicture}`
+      : null;
+
     res.status(200).send({
       success: true,
-      user,
+      user: { ...user.toObject(), profilePicture: fullImageUrl },
     });
   } catch (error) {
     console.error(error);
@@ -161,6 +178,7 @@ const getUserDataController = async (req, res) => {
     });
   }
 };
+
 const deleteAccountController = async (req, res) => {
   const userId = req.user._id; // Assuming you set the user ID in the auth middleware
 

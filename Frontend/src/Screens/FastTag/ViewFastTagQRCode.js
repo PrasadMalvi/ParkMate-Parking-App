@@ -77,8 +77,7 @@ const ViewFastTagQRCode = ({ route }) => {
         Alert.alert("No QR code found for this mall.");
       }
     } catch (error) {
-      console.error("Error fetching existing QR code:", error);
-      Alert.alert("Error fetching existing QR code.");
+      console.log("Error fetching existing QR code:", error);
     } finally {
       setLoading(false);
     }
@@ -96,7 +95,7 @@ const ViewFastTagQRCode = ({ route }) => {
       console.log("FastTag ID:", fastTagId); // Log the FastTag ID
 
       const response = await axios.post(
-        `http://192.168.0.101:5050/fasttag/generateQRCode/${fastTagId}`, // Full URL here
+        `/fasttag/generateQRCode/${fastTagId}`, // Full URL here
         { vehicleId: selectedVehicle }, // Ensure vehicleId is sent
         { headers: { Authorization: `Bearer ${token}` } }
       );
